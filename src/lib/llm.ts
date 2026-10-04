@@ -288,7 +288,10 @@ async function callOpenAiCompatible<S extends z.ZodType>(
         },
         body: JSON.stringify({
           model: config.model,
-          max_tokens: 2048,
+          // Gemini 3.x models think by default and count those tokens against
+          // max_tokens — a small budget returns finish_reason "length" with an
+          // empty content field. Verified: 50 tokens produced no text at all.
+          max_tokens: 8192,
           // Real schema enforcement, not just "return some JSON". A judge whose
           // output fails to parse scores 0, so a loose response format would
           // quietly corrupt every number in the results.

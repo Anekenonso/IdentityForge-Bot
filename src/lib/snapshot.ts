@@ -19,7 +19,7 @@ import {
   SNAPSHOT_ANCHOR,
   type MemoryEnvelope,
 } from "./envelope.ts";
-import { recallMemories, type RecalledMemory } from "./walrus.ts";
+import { recallMemories, type RecallOutcome, type RecalledMemory } from "./walrus.ts";
 
 /**
  * Probe phrasings. One is not enough: the relayer ranks by meaning, and the
@@ -136,13 +136,30 @@ export async function reconstruct(
 ): Promise<Reconstruction> {
   const started = Date.now();
 
-  const [snapshotOutcome, ...relevanceOutcomes] = await Promise.all([
+  // Reconstruction issues up to 8 concurrent connections. The relayer
+  // occasionally exceeds undici's 10s connect timeout under that burst, and a
+  // single timed-out recall must not fail the whole turn — degrade to whatever
+  // came back (plan §12: relayer unreachable -> degraded, not fatal).
+  const settled = await Promise.allSettled([
     retrieveSnapshot(namespace),
     recallMemories(userMessage, { limit: RELEVANCE_LIMIT, namespace }),
     ...STANDING_QUERIES.map((q) =>
       recallMemories(q, { limit: RELEVANCE_LIMIT, namespace }),
     ),
   ]);
+
+  let failures = 0;
+  const snapshotOutcome: SnapshotOutcome =
+    settled[0]?.status === "fulfilled"
+      ? settled[0].value
+      : { snapshot: null, found: false, inspected: 0, unparsed: 0, droppedCount: 0, latencyMs: 0, diagnostic: "Snapshot retrieval failed." };
+  if (settled[0]?.status === "rejected") failures += 1;
+
+  const relevanceOutcomes: RecallOutcome[] = [];
+  for (const item of settled.slice(1)) {
+    if (item.status === "fulfilled") relevanceOutcomes.push(item.value as RecallOutcome);
+    else failures += 1;
+  }
 
   // Union by blob id: the user message and the standing queries frequently
   // surface the same memory, and a duplicate would otherwise be counted twice.
@@ -176,6 +193,16 @@ export async function reconstruct(
 
   const empty = snapshotOutcome.snapshot === null && factOnly.length === 0;
 
+  // A partial recall set is a degraded turn, not a clean one. Say so, so the
+  // fidelity numbers and the evidence panel never quietly overstate coverage.
+  const notes = [snapshotOutcome.diagnostic];
+  if (failures > 0) {
+    notes.push(
+      `${failures} of ${settled.length} recall calls failed (relayer connect timeout). ` +
+        `This turn ran on partial context.`,
+    );
+  }
+
   return {
     snapshot: snapshotOutcome.snapshot,
     facts: factOnly,
@@ -185,7 +212,7 @@ export async function reconstruct(
     unparsed,
     droppedCount,
     latencyMs: Date.now() - started,
-    diagnostic: snapshotOutcome.diagnostic,
+    diagnostic: notes.filter(Boolean).join(" ") || null,
   };
 }
 

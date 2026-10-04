@@ -1,0 +1,130 @@
+{
+  "startedAt": "2026-10-04T15:31:17.337Z",
+  "provenance": {
+    "relayer": "https://relayer.memory.walrus.xyz",
+    "mode": "production",
+    "writeReady": true,
+    "status": "ok",
+    "apiVersion": "1.0.0",
+    "relayerVersion": "0.1.0",
+    "buildCommit": null,
+    "promptVersions": {
+      "extract": "extract.v6",
+      "ask": "ask.v2"
+    },
+    "capturedAt": "2026-10-04T15:31:17.342Z"
+  },
+  "writes": [
+    {
+      "content": "The user is Alex, a senior Rust engineer building on Sui.",
+      "blobId": "EEhLK2OJhal8jCWqqMP_vHpDt9EWnbTUmwB0WmoFVtc",
+      "latencyMs": 28947
+    },
+    {
+      "content": "The user prefers dark mode in every editor and terminal.",
+      "blobId": "YAAz5SHP-IbsBiqaMJ69vEeGWFNXwxe4GKAoGHTl4qg",
+      "latencyMs": 36437
+    },
+    {
+      "content": "The user's goal is to submit a working hackathon entry before the deadline.",
+      "blobId": "UWlHmD8JUEZbnkcL214De6MHsbN-2vgbgArgNhDCnbs",
+      "latencyMs": 36437
+    },
+    {
+      "content": "The user decided to use Next.js 15 for the frontend.",
+      "blobId": "x47rI3jU-oogahKT-jw42popP576lxumauZcWZLP0Mw",
+      "latencyMs": 36437
+    },
+    {
+      "content": "The user mentioned deploying to Vercel as a priority.",
+      "blobId": "Dck68Kn03u4rlEhmBtXWW-LaEgXFN5kp7VaagEndu6w",
+      "latencyMs": 36437
+    },
+    {
+      "content": "The user prefers TypeScript over JavaScript for all new code.",
+      "blobId": "S_cJ8v3T6PiCVbDdARRWKDYXkMHacHdLsvQtEywQuXU",
+      "latencyMs": 36437
+    },
+    {
+      "content": "The user works in the Hanoi office three days a week.",
+      "blobId": "AbmlI6JEoSJSMB8h812_R7a2bjO8Xfw9AfFLXqVPRCk",
+      "latencyMs": 36437
+    },
+    {
+      "content": "The user decided against a vector database and to use the relayer's index.",
+      "blobId": "W8TflZkCV4i73uiMeDBp5_sc3czd_tcIvZS05RW5Jqg",
+      "latencyMs": 36437
+    }
+  ],
+  "recall": {
+    "probes": [
+      {
+        "query": "What does the user do for a living?",
+        "expected": "Rust engineer",
+        "found": true,
+        "returned": 8,
+        "droppedCount": 0,
+        "unparsed": 0
+      },
+      {
+        "query": "What colour scheme does the user like?",
+        "expected": "dark mode",
+        "found": true,
+        "returned": 8,
+        "droppedCount": 0,
+        "unparsed": 0
+      },
+      {
+        "query": "What is the user trying to accomplish?",
+        "expected": "hackathon",
+        "found": true,
+        "returned": 8,
+        "droppedCount": 0,
+        "unparsed": 0
+      },
+      {
+        "query": "Which frontend framework was chosen?",
+        "expected": "Next.js",
+        "found": true,
+        "returned": 8,
+        "droppedCount": 0,
+        "unparsed": 0
+      },
+      {
+        "query": "Where does the user usually work from?",
+        "expected": "Hanoi",
+        "found": true,
+        "returned": 8,
+        "droppedCount": 0,
+        "unparsed": 0
+      }
+    ],
+    "recallAt8": 1
+  },
+  "snapshot": {
+    "found": true,
+    "inspected": 12,
+    "selectedVersion": 2,
+    "diagnostic": null
+  },
+  "isolation": {
+    "leaked": 0
+  },
+  "namespaces": [
+    {
+      "name": "spike_v3",
+      "memoryCount": 12,
+      "updatedAt": "2026-10-04T15:33:24.903454Z"
+    }
+  ],
+  "restore": {
+    "restored": 0,
+    "skipped": 12,
+    "failed": 0,
+    "total": 12,
+    "truncated": false,
+    "namespace": "spike_v3",
+    "owner": "0x44b35b6f89b216cbfcf3aaaa57aee2621544b931fa599d16365e77bb1944131d",
+    "latencyMs": 7075
+  }
+}

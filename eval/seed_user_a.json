@@ -1,0 +1,62 @@
+{
+  "label": "SIMULATED",
+  "name": "Alex Rivera",
+  "notes": "Structured so that six facts are superseded by later versions. The superseded (old) facts are written too — append-only storage means the staleness test only works if they exist on chain.",
+  "facts": [
+    { "key": "user-name",   "type": "persona",    "content": "The user's name is Alex Rivera." },
+    { "key": "role",         "type": "persona",    "content": "Alex is a senior Rust engineer who builds on the Sui blockchain." },
+    { "key": "location",     "type": "persona",    "content": "Alex lives in Hanoi, Vietnam." },
+    { "key": "tenure",       "type": "persona",    "content": "Alex has been programming professionally for about twelve years." },
+
+    { "key": "goal-hack",    "type": "goal",       "content": "Alex's current goal is to submit a working hackathon entry before the deadline." },
+    { "key": "goal-learn",   "type": "goal",       "content": "Alex is learning Walrus Memory internals in order to build an auditable agent memory layer." },
+    { "key": "goal-ship",    "type": "goal",       "content": "Alex wants to ship a working system before polishing the interface." },
+    { "key": "goal-measure", "type": "goal",       "content": "Alex wants to measure cold-start fidelity rather than assert it." },
+    { "key": "goal-honest",  "type": "goal",       "content": "Alex wants the limitations section written before the demo video is recorded." },
+    { "key": "goal-present", "type": "goal",       "content": "Alex plans to present the results table at the end of the demo." },
+
+    { "key": "pref-theme",   "type": "preference", "content": "Alex prefers dark mode in every editor and terminal." },
+    { "key": "pref-language","type": "preference", "content": "Alex writes all new code in TypeScript rather than JavaScript." },
+    { "key": "pref-editor",  "type": "preference", "content": "Alex uses Neovim as the primary editor." },
+    { "key": "pref-shell",   "type": "preference", "content": "Alex uses fish as a shell." },
+    { "key": "pref-tests",   "type": "preference", "content": "Alex prefers integration tests over unit tests for storage layers." },
+    { "key": "pref-docs",    "type": "preference", "content": "Alex prefers a short honest limitations section over a long feature list." },
+    { "key": "pref-commits", "type": "preference", "content": "Alex commits once at each phase boundary rather than many times a day." },
+    { "key": "pref-demo",    "type": "preference", "content": "Alex prefers a live demo with a recorded video as a fallback." },
+
+    { "key": "dec-frontend", "type": "decision",   "content": "Alex decided to use Next.js 15 for the frontend." },
+    { "key": "dec-storage",  "type": "decision",   "content": "Alex decided to rely on the relayer's vector index rather than running a separate vector database." },
+    { "key": "dec-hash",     "type": "decision",   "content": "Alex decided to use Node's built-in crypto module for content hashing." },
+    { "key": "dec-forget",   "type": "decision",   "content": "Alex decided that forget should rotate the namespace generation." },
+    { "key": "dec-judge",    "type": "decision",   "content": "Alex chose Claude Haiku 4.5 as the offline judge because it is cheap and independent of the agent models." },
+    { "key": "dec-anchor",   "type": "decision",   "content": "Alex decided to retrieve snapshots in-band because recall exposes no metadata filter." },
+
+    { "key": "hist-deploy",  "type": "history",    "content": "Alex deployed the first working version to Vercel on the same day it was built." },
+    { "key": "hist-key",     "type": "history",    "content": "Alex created a delegate key at memory.walrus.xyz." },
+    { "key": "hist-mode",    "type": "history",    "content": "Alex confirmed the relayer reports mode production before trusting its numbers." },
+    { "key": "hist-latency", "type": "history",    "content": "Alex measured a 29 second single memory write and switched seeding to bulk writes." },
+    { "key": "hist-bulk",    "type": "history",    "content": "Alex found bulk writes run at roughly 5 seconds per fact." },
+    { "key": "hist-iso",     "type": "history",    "content": "Alex verified that a recall in one namespace never returns another namespace's memories." },
+    { "key": "hist-recall",  "type": "history",    "content": "Alex measured recall at 8 across five probes and got all five correct." },
+    { "key": "hist-reset",   "type": "history",    "content": "Alex reset the project completion checklist because unbuilt work had been marked as done." },
+
+    { "key": "old-deadline", "type": "history",    "content": "Alex's submission deadline is October 20." },
+    { "key": "new-deadline", "type": "history",    "content": "Alex's submission deadline is October 8.", "supersedes": "old-deadline" },
+
+    { "key": "old-stack",    "type": "history",    "content": "Alex's primary programming stack is JavaScript." },
+    { "key": "new-stack",    "type": "history",    "content": "Alex's primary programming stack is TypeScript on Node.js.", "supersedes": "old-stack" },
+
+    { "key": "old-theme",    "type": "preference", "content": "Alex prefers a light colour theme." },
+    { "key": "new-theme",    "type": "preference", "content": "Alex prefers a dark colour theme.", "supersedes": "old-theme" },
+
+    { "key": "old-city",     "type": "persona",    "content": "Alex lives in Berlin, Germany." },
+    { "key": "new-city",     "type": "persona",    "content": "Alex lives in Hanoi, Vietnam.", "supersedes": "old-city" },
+
+    { "key": "old-level",    "type": "persona",    "content": "Alex is a junior software engineer." },
+    { "key": "new-level",    "type": "persona",    "content": "Alex is a senior software engineer.", "supersedes": "old-level" },
+
+    { "key": "old-tests",    "type": "preference", "content": "Alex prefers unit tests over integration tests." },
+    { "key": "new-tests",    "type": "preference", "content": "Alex prefers integration tests over unit tests.", "supersedes": "old-tests" }
+  ],
+  "snapshot": "Alex Rivera is a senior Rust engineer on Sui who lives in Hanoi, Vietnam, and has been programming professionally for about twelve years. Alex's goal is to submit a working hackathon entry by October 8, and to measure cold-start fidelity rather than assert it. Alex writes new code in TypeScript, uses Neovim and fish, prefers dark mode, and prefers integration tests over unit tests for storage layers. Alex chose Next.js 15 for the frontend, relies on the relayer's vector index rather than a separate vector database, and made forget rotate the namespace generation."
+}

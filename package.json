@@ -11,9 +11,9 @@
     "build": "next build",
     "start": "next start",
     "test": "node --import tsx --test \"src/**/*.test.ts\"",
-    "spike": "tsx scripts/spike.ts",
-    "eval": "tsx scripts/run-eval.ts",
-    "seed": "tsx scripts/seed.ts"
+    "spike": "node --env-file=.env.local --import tsx scripts/spike.ts",
+    "eval": "node --env-file=.env.local --import tsx scripts/run-eval.ts",
+    "seed": "node --env-file=.env.local --import tsx scripts/seed.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",

@@ -1,0 +1,30 @@
+{
+  "label": "SIMULATED",
+  "name": "Priya Raman",
+  "notes": "A second, structurally different persona. Its purpose is to defend against the objection that the harness was tuned to one user: if the numbers hold for a different person with a different fact mix, they are measuring the system rather than the seed.",
+  "facts": [
+    { "key": "b-name",     "type": "persona",    "content": "The user's name is Priya Raman." },
+    { "key": "b-role",     "type": "persona",    "content": "Priya is a data engineer working in Python." },
+    { "key": "b-city",     "type": "persona",    "content": "Priya lives in Lisbon, Portugal." },
+    { "key": "b-tense",    "type": "persona",    "content": "Priya has worked in data engineering for six years." },
+
+    { "key": "b-goal-1",   "type": "goal",       "content": "Priya's goal is to migrate an analytics pipeline off a legacy warehouse." },
+    { "key": "b-goal-2",   "type": "goal",       "content": "Priya wants to publish the migration guide before starting the cutover." },
+
+    { "key": "b-pref-1",   "type": "preference", "content": "Priya prefers DuckDB over a traditional warehouse." },
+    { "key": "b-pref-2",   "type": "preference", "content": "Priya prefers tests written before the migration runs." },
+    { "key": "b-pref-3",   "type": "preference", "content": "Priya prefers linear regression models over deep learning." },
+
+    { "key": "b-dec-1",    "type": "decision",   "content": "Priya decided to run the old and new pipelines in parallel for one month." },
+    { "key": "b-dec-2",    "type": "decision",   "content": "Priya decided to use dbt for the transformation layer." },
+
+    { "key": "b-hist-1",   "type": "history",    "content": "Priya presented the migration plan to the data team in September." },
+
+    { "key": "b-old-db",   "type": "decision",   "content": "Priya decided to use Snowflake as the primary warehouse." },
+    { "key": "b-new-db",   "type": "decision",   "content": "Priya decided to move off Snowflake toward DuckDB.", "supersedes": "b-old-db" },
+
+    { "key": "b-old-cad",  "type": "preference", "content": "Priya prefers a scheduled batch cadence." },
+    { "key": "b-new-cad",  "type": "preference", "content": "Priya prefers a streaming cadence.", "supersedes": "b-old-cad" }
+  ],
+  "snapshot": "Priya Raman is a data engineer in Lisbon, Portugal, with six years of experience. She is migrating an analytics pipeline off a legacy warehouse, prefers DuckDB over a traditional warehouse and linear regression over deep learning, and decided to run the old and new pipelines in parallel for one month before cutover. She uses dbt for the transformation layer and prefers tests to be written before the migration runs."
+}

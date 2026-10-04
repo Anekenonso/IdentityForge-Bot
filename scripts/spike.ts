@@ -21,6 +21,7 @@ import {
   captureProvenance,
   listNamespaces,
   recallMemories,
+  rememberMemoriesBulk,
   rememberMemory,
   resolveLiveNamespace,
   restoreNamespace,
@@ -88,18 +89,49 @@ async function main(): Promise<void> {
   // -- 2. Writes -----------------------------------------------------------
   console.log("\n[2/6] Writing seed memories");
   const written: { content: string; blobId: string; latencyMs: number }[] = [];
-  for (const fact of SEED_FACTS) {
-    const memory = createMemory({ type: fact.type, content: fact.content });
-    const result = await rememberMemory(memory, encode(memory), SPIKE_NAMESPACE);
-    written.push({
-      content: fact.content,
-      blobId: result.blobId,
-      latencyMs: result.latencyMs,
+
+  // One single write first, to get an uncontaminated per-write baseline.
+  const first = createMemory({ type: SEED_FACTS[0]!.type, content: SEED_FACTS[0]!.content });
+  const firstResult = await rememberMemory(first, encode(first), SPIKE_NAMESPACE);
+  written.push({
+    content: SEED_FACTS[0]!.content,
+    blobId: firstResult.blobId,
+    latencyMs: firstResult.latencyMs,
+  });
+  console.log(
+    `  single  ${firstResult.blobId.slice(0, 16)}…  ${firstResult.latencyMs}ms  (baseline)`,
+  );
+
+  // Then bulk, to see whether seeding is tractable at this write latency.
+  const rest = SEED_FACTS.slice(1).map((f) => {
+    const memory = createMemory({ type: f.type, content: f.content });
+    return { memory, encoded: encode(memory) };
+  });
+
+  if (rest.length > 0) {
+    const bulk = await rememberMemoriesBulk(rest, SPIKE_NAMESPACE);
+    rest.forEach((item, i) => {
+      const result = bulk.results[i];
+      if (result?.blobId) {
+        written.push({
+          content: item.memory.content,
+          blobId: result.blobId,
+          latencyMs: bulk.latencyMs,
+        });
+      }
     });
-    console.log(`  wrote  ${result.blobId.slice(0, 18)}…  ${result.latencyMs}ms  ${fact.content.slice(0, 44)}`);
+    console.log(
+      `  bulk    ${bulk.succeeded}/${rest.length} in ${bulk.latencyMs}ms ` +
+        `(${(bulk.latencyMs / Math.max(bulk.succeeded, 1)).toFixed(0)}ms/fact)`,
+    );
+    if (bulk.failed > 0) {
+      console.log(`  !! ${bulk.failed} bulk writes failed: ${bulk.results.find((r) => r.error)?.error}`);
+    }
   }
+
   report.writes = written;
-  line("total write latency", `${written.reduce((s, w) => s + w.latencyMs, 0)}ms`);
+  line("single-write latency", `${firstResult.latencyMs}ms`);
+  line("seeds written", written.length);
 
   // -- 3. Recall quality (A9 — the one genuinely unknown) ------------------
   console.log("\n[3/6] Recall quality (assumption A9)");

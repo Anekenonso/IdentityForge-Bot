@@ -38,6 +38,15 @@ export function readConfig(): WalrusConfig {
 
 let client: MemWal | null = null;
 
+/**
+ * Measured on mainnet 2026-10-04: a single `rememberAndWait` took 35.3s, and
+ * writes at 30s timeout failed intermittently. The SDK documents a 90s poll
+ * budget as a real scenario, so the timeout has to be generous. This is the
+ * single biggest latency in the system and it is on the write path only —
+ * reads are fast.
+ */
+export const WRITE_TIMEOUT_MS = 120_000;
+
 export function getClient(): MemWal {
   if (client) return client;
   const config = readConfig();
@@ -46,6 +55,7 @@ export function getClient(): MemWal {
     accountId: config.accountId,
     serverUrl: config.serverUrl,
     namespace: config.namespace,
+    requestTimeoutMs: WRITE_TIMEOUT_MS,
   });
   return client;
 }
@@ -198,13 +208,59 @@ export async function rememberMemory(
   const started = Date.now();
   const memwal = getClient();
   const result = await memwal.rememberAndWait(encoded, namespace, {
-    timeoutMs: 30_000,
+    timeoutMs: WRITE_TIMEOUT_MS,
   });
   return {
     memory,
     blobId: result.blob_id,
     latencyMs: Date.now() - started,
     owner: result.owner,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Bulk writes — the seeding path.
+//
+// At the measured 35s per write, seeding 40 facts one at a time would take ~23
+// minutes. rememberBulk accepts up to 20 items per call, so a seed is 2 round
+// trips. This matters most for the eval harness, which re-seeds per condition.
+// ---------------------------------------------------------------------------
+
+export const BULK_MAX = 20;
+
+export interface BulkWriteOutcome {
+  succeeded: number;
+  failed: number;
+  /** Parallel to the input order. */
+  results: { blobId: string | null; error: string | null; memory: MemoryEnvelope }[];
+  latencyMs: number;
+}
+
+export async function rememberMemoriesBulk(
+  items: { memory: MemoryEnvelope; encoded: string }[],
+  namespace?: string,
+): Promise<BulkWriteOutcome> {
+  const started = Date.now();
+  const memwal = getClient();
+
+  if (items.length > BULK_MAX) {
+    throw new Error(`Bulk write takes at most ${BULK_MAX} items; got ${items.length}.`);
+  }
+
+  const result = await memwal.rememberBulkAndWait(
+    items.map((i) => ({ text: i.encoded, namespace })),
+    { timeoutMs: WRITE_TIMEOUT_MS * 2 },
+  );
+
+  return {
+    succeeded: result.succeeded,
+    failed: result.failed,
+    results: result.results.map((r, i) => ({
+      blobId: r.status === "done" ? r.blob_id : null,
+      error: r.status === "done" ? null : (r.error ?? r.status),
+      memory: items[i]?.memory as MemoryEnvelope,
+    })),
+    latencyMs: Date.now() - started,
   };
 }
 

@@ -1,0 +1,40 @@
+{
+  "label": "SIMULATED",
+  "notes": "30 probes. `expect` is the gold answer for direct/persona/goal/trap kinds; the judge scores a reply against it. For `negative` probes expect is null and the only correct behaviour is to state ignorance. For `trap` probes `forbidden` lists the superseded value the agent must NOT assert as current.",
+  "probes": [
+    { "id": "r01", "kind": "direct",   "question": "What is my name?",                                   "expect": "Alex Rivera" },
+    { "id": "r02", "kind": "direct",   "question": "What do I do for a living?",                          "expect": "senior Rust engineer on Sui" },
+    { "id": "r03", "kind": "direct",   "question": "Which programming language do I write new code in?",  "expect": "TypeScript" },
+    { "id": "r04", "kind": "direct",   "question": "Which editor do I use?",                             "expect": "Neovim" },
+    { "id": "r05", "kind": "direct",   "question": "Which shell do I use?",                              "expect": "fish" },
+    { "id": "r06", "kind": "direct",   "question": "Which frontend framework did I choose?",              "expect": "Next.js 15" },
+    { "id": "r07", "kind": "direct",   "question": "Did I decide to run my own vector database?",         "expect": "no, rely on the relayer's vector index" },
+    { "id": "r08", "kind": "direct",   "question": "How did I decide forget should work?",                 "expect": "rotate the namespace generation" },
+    { "id": "r09", "kind": "direct",   "question": "What did I measure about recall quality?",             "expect": "recall at 8 across five probes, all five correct" },
+    { "id": "r10", "kind": "direct",   "question": "What single write latency did I measure, and what did I do about it?", "expect": "29 seconds, switched to bulk writes" },
+
+    { "id": "p01", "kind": "persona",  "question": "Summarise who you work with and how they describe themselves.", "expect": "senior Rust engineer, about twelve years professionally, on Sui" },
+    { "id": "p02", "kind": "persona",  "question": "How would you describe my professional seniority?",  "expect": "senior" },
+    { "id": "p03", "kind": "persona",  "question": "What is my usual development setup, start to finish?", "expect": "Neovim, TypeScript, fish, dark mode" },
+    { "id": "p04", "kind": "persona",  "question": "How experienced am I?",                              "expect": "about twelve years professionally" },
+    { "id": "p05", "kind": "persona",  "question": "What kind of work do I do?",                           "expect": "Rust development on the Sui blockchain" },
+
+    { "id": "g01", "kind": "goal",     "question": "What am I trying to accomplish right now?",           "expect": "submit a working hackathon entry before the deadline" },
+    { "id": "g02", "kind": "goal",     "question": "What do I want to measure, and why?",                 "expect": "cold-start fidelity, measured rather than asserted" },
+    { "id": "g03", "kind": "goal",     "question": "In what order do I want to build and document?",      "expect": "ship working system first, write limitations before recording the demo" },
+    { "id": "g04", "kind": "goal",     "question": "What am I learning right now?",                       "expect": "Walrus Memory internals to build an auditable memory layer" },
+    { "id": "g05", "kind": "goal",     "question": "What did I choose as the offline judge, and why?",    "expect": "Claude Haiku 4.5, cheap and independent of the agent models" },
+
+    { "id": "t01", "kind": "trap",     "question": "When is my submission deadline?",                     "expect": "October 8", "forbidden": ["October 20"] },
+    { "id": "t02", "kind": "trap",     "question": "What is my primary programming stack?",               "expect": "TypeScript on Node.js", "forbidden": ["JavaScript"] },
+    { "id": "t03", "kind": "trap",     "question": "Do I prefer a light or dark colour theme?",           "expect": "dark", "forbidden": ["light"] },
+    { "id": "t04", "kind": "trap",     "question": "Which city do I live in?",                            "expect": "Hanoi", "forbidden": ["Berlin"] },
+    { "id": "t05", "kind": "trap",     "question": "Do I prefer unit tests or integration tests?",        "expect": "integration tests", "forbidden": ["unit tests"] },
+
+    { "id": "n01", "kind": "negative", "question": "What is my mother's name?",                           "expect": null },
+    { "id": "n02", "kind": "negative", "question": "What is my home address?",                            "expect": null },
+    { "id": "n03", "kind": "negative", "question": "What did I buy online last week?",                     "expect": null },
+    { "id": "n04", "kind": "negative", "question": "What is my salary?",                                  "expect": null },
+    { "id": "n05", "kind": "negative", "question": "What is my blood type?",                              "expect": null }
+  ]
+}

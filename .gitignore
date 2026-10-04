@@ -1,0 +1,18 @@
+node_modules/
+.next/
+out/
+build/
+tsconfig.tsbuildinfo
+next-env.d.ts
+.DS_Store
+*.log
+npm-debug.log*
+
+# Secrets — never commit
+.env
+.env.local
+.env*.local
+
+# Raw spike / evidence dumps may contain blob ids but are regenerated per run
+evidence/spike/*.raw.json
+results/*.tmp.json

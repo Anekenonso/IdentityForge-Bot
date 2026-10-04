@@ -5,11 +5,12 @@
   --bg: #0c0a09;
   --bg-subtle: #141210;
   --panel: #1c1917;
-  --panel-2: #26221f;
+  --panel-2: #24201d;
   --panel-card: rgba(28, 25, 23, 0.72);
+  --panel-hover: rgba(38, 34, 31, 0.85);
   --border: rgba(255, 255, 255, 0.10);
   --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-glow: rgba(240, 193, 0, 0.28);
+  --border-glow: rgba(240, 193, 0, 0.32);
   --text: #fafaf9;
   --muted: #a6a09b;
   --muted-dark: #78716c;
@@ -17,6 +18,7 @@
   /* Fauzec signature brand amber/gold palette */
   --brand: #f0c100;
   --brand-light: #ffd236;
+  --brand-dim: rgba(240, 193, 0, 0.12);
   --primary: #d27a00;
   --primary-gradient: linear-gradient(135deg, #fbcb21 0%, #d27a00 100%);
   --primary-gradient-hover: linear-gradient(135deg, #ffd236 0%, #dd7400 100%);
@@ -31,11 +33,17 @@
   --info: #38bdf8;
   --info-dim: rgba(56, 189, 248, 0.12);
   
+  --radius-sm: 8px;
   --radius: 12px;
   --radius-lg: 16px;
   --radius-pill: 9999px;
   --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.28);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px rgba(240, 193, 0, 0.25);
 }
 
 * {
@@ -47,8 +55,8 @@ html, body {
   padding: 0;
   background-color: var(--bg);
   background-image: 
-    radial-gradient(ellipse 1100px 600px at 100% 0%, rgba(240, 193, 0, 0.10) 0%, transparent 60%),
-    radial-gradient(ellipse 900px 500px at 0% 100%, rgba(210, 122, 0, 0.07) 0%, transparent 55%);
+    radial-gradient(ellipse 1100px 600px at 100% 0%, rgba(240, 193, 0, 0.11) 0%, transparent 60%),
+    radial-gradient(ellipse 900px 500px at 0% 100%, rgba(210, 122, 0, 0.08) 0%, transparent 55%);
   background-attachment: fixed;
   color: var(--text);
   font-family: var(--font-sans);
@@ -58,10 +66,10 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Scrollbars */
+/* Custom modern scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
@@ -71,7 +79,7 @@ html, body {
   border-radius: var(--radius-pill);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.24);
 }
 
 .shell {
@@ -81,7 +89,7 @@ html, body {
   min-height: 100vh;
 }
 
-@media (max-width: 990px) {
+@media (max-width: 1040px) {
   .shell {
     grid-template-columns: 1fr;
   }
@@ -96,18 +104,19 @@ html, body {
   flex-direction: column;
   min-width: 0;
   position: relative;
+  height: 100vh;
+  overflow: hidden;
 }
 
-/* Masthead inspired by Fauzec's clean header */
+/* Header Masthead */
 .masthead {
-  padding: 22px 28px 18px;
+  padding: 18px 28px 16px;
   border-bottom: 1px solid var(--border);
-  background: rgba(12, 10, 9, 0.75);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  position: sticky;
-  top: 0;
+  background: rgba(12, 10, 9, 0.82);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   z-index: 20;
+  flex-shrink: 0;
 }
 
 .brand-row {
@@ -125,15 +134,20 @@ html, body {
 }
 
 .brand-glyph {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
   background: var(--primary-gradient);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 14px rgba(210, 122, 0, 0.35);
+  box-shadow: 0 4px 16px rgba(210, 122, 0, 0.4);
   flex-shrink: 0;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.brand-glyph:hover {
+  transform: rotate(-6deg) scale(1.05);
 }
 
 .brand-glyph svg {
@@ -157,28 +171,27 @@ html, body {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 500;
-  padding: 2px 7px;
+  padding: 2px 8px;
   border-radius: var(--radius-pill);
-  background: rgba(240, 193, 0, 0.14);
+  background: rgba(240, 193, 0, 0.12);
   color: var(--brand-light);
-  border: 1px solid rgba(240, 193, 0, 0.3);
+  border: 1px solid rgba(240, 193, 0, 0.28);
 }
 
 .thesis {
-  margin: 10px 0 0;
+  margin: 8px 0 0;
   color: var(--muted);
   font-size: 13.5px;
-  line-height: 1.55;
-  max-width: 72ch;
+  line-height: 1.5;
+  max-width: 74ch;
 }
 
-/* Pill badges with Fauzec-style glowing status dots */
+/* Fauzec style status badges */
 .badges {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  margin-top: 14px;
 }
 
 .badge {
@@ -191,7 +204,7 @@ html, body {
   padding: 3px 10px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--border);
-  background: rgba(28, 25, 23, 0.6);
+  background: rgba(28, 25, 23, 0.65);
   color: var(--text);
   white-space: nowrap;
   backdrop-filter: blur(8px);
@@ -199,8 +212,8 @@ html, body {
 }
 
 .status-dot {
-  width: 6px;
-  height: 6px;
+  width: 6.5px;
+  height: 6.5px;
   border-radius: 50%;
   background: currentColor;
   display: inline-block;
@@ -256,43 +269,51 @@ html, body {
   flex-direction: column;
   gap: 18px;
   overflow-y: auto;
+  scroll-behavior: smooth;
 }
 
-/* Empty onboarding prompt box */
+/* Empty Hero Box */
 .empty-hero {
-  padding: 32px 24px;
+  padding: 36px 28px;
   border-radius: var(--radius-lg);
-  border: 1px dashed rgba(240, 193, 0, 0.25);
-  background: radial-gradient(circle at top left, rgba(240, 193, 0, 0.06), transparent 70%), rgba(28, 25, 23, 0.45);
+  border: 1px dashed rgba(240, 193, 0, 0.28);
+  background: 
+    radial-gradient(circle at 10% 20%, rgba(240, 193, 0, 0.08), transparent 50%),
+    rgba(28, 25, 23, 0.55);
   text-align: center;
   margin: auto 0;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow-md);
+  animation: fadeIn 0.3s ease;
 }
 
 .empty-hero-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
   background: rgba(240, 193, 0, 0.12);
-  color: var(--brand);
+  color: var(--brand-light);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 14px rgba(240, 193, 0, 0.15);
 }
 
 .empty-hero h3 {
-  margin: 0 0 6px;
-  font-size: 16px;
-  font-weight: 600;
+  margin: 0 0 8px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--text);
 }
 
 .empty-hero p {
-  margin: 0 auto 18px;
-  max-width: 52ch;
+  margin: 0 auto 20px;
+  max-width: 56ch;
   color: var(--muted);
   font-size: 13.5px;
+  line-height: 1.55;
 }
 
 .quick-prompts {
@@ -300,20 +321,23 @@ html, body {
   flex-wrap: wrap;
   gap: 8px;
   justify-content: center;
-  max-width: 64ch;
+  max-width: 68ch;
   margin: 0 auto;
 }
 
 .quick-prompt-btn {
   font-family: inherit;
-  font-size: 12px;
-  padding: 6px 12px;
+  font-size: 12.5px;
+  padding: 7px 14px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--border);
-  background: var(--panel);
+  background: rgba(28, 25, 23, 0.8);
   color: var(--muted);
   cursor: pointer;
-  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.16s ease;
 }
 
 .quick-prompt-btn:hover {
@@ -321,16 +345,17 @@ html, body {
   color: var(--text);
   background: var(--panel-2);
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
-/* Message Bubbles */
+/* Message items */
 .msg {
-  max-width: 78ch;
-  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 80ch;
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -356,27 +381,29 @@ html, body {
   white-space: pre-wrap;
   font-size: 14.5px;
   line-height: 1.62;
+  word-break: break-word;
 }
 
 .msg.user .body {
   background: var(--panel-2);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 16px 16px 4px 16px;
-  padding: 12px 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  padding: 12px 18px;
+  box-shadow: var(--shadow-md);
   color: var(--text);
 }
 
 .msg.assistant .body {
-  background: rgba(28, 25, 23, 0.55);
+  background: rgba(28, 25, 23, 0.65);
   border: 1px solid var(--border);
   border-left: 3px solid var(--brand);
   border-radius: 4px 16px 16px 16px;
   padding: 14px 18px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(10px);
 }
 
-/* Citation tags with content-addressed blob reference */
+/* Citations tags */
 .cites {
   margin-top: 10px;
   display: flex;
@@ -390,32 +417,35 @@ html, body {
   gap: 5px;
   font-family: var(--font-mono);
   font-size: 11px;
-  padding: 3px 8px;
+  padding: 3px 9px;
   border-radius: 6px;
   background: rgba(240, 193, 0, 0.12);
   color: var(--brand-light);
-  border: 1px solid rgba(240, 193, 0, 0.24);
+  border: 1px solid rgba(240, 193, 0, 0.26);
   cursor: help;
   transition: all 0.15s ease;
 }
 
 .cite:hover {
-  background: rgba(240, 193, 0, 0.20);
-  border-color: rgba(240, 193, 0, 0.45);
+  background: rgba(240, 193, 0, 0.22);
+  border-color: rgba(240, 193, 0, 0.5);
+  transform: translateY(-1px);
 }
 
-.cite-icon {
-  opacity: 0.75;
-}
-
-/* Pending confirmation card (code owns authority) */
+/* Pending confirmation card */
 .pending {
   margin-top: 12px;
-  border: 1px solid rgba(249, 156, 0, 0.35);
-  background: rgba(249, 156, 0, 0.07);
+  border: 1px solid rgba(249, 156, 0, 0.4);
+  background: rgba(249, 156, 0, 0.08);
   border-radius: var(--radius);
   padding: 14px 16px;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
+  animation: glowPulse 3s infinite ease-in-out;
+}
+
+@keyframes glowPulse {
+  0%, 100% { border-color: rgba(249, 156, 0, 0.4); }
+  50% { border-color: rgba(249, 156, 0, 0.7); }
 }
 
 .pending .label {
@@ -423,22 +453,22 @@ html, body {
   align-items: center;
   gap: 6px;
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--warn);
   margin-bottom: 8px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 
 .pending .text {
   font-size: 14px;
   color: var(--text);
   margin-bottom: 12px;
-  background: rgba(12, 10, 9, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(12, 10, 9, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
-  padding: 8px 12px;
+  padding: 9px 12px;
 }
 
 .pending .actions {
@@ -451,8 +481,8 @@ button {
   font-family: inherit;
   font-size: 13px;
   font-weight: 500;
-  padding: 8px 14px;
-  border-radius: 8px;
+  padding: 8px 15px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   background: var(--panel-2);
   color: var(--text);
@@ -463,16 +493,22 @@ button {
   gap: 6px;
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
+  min-height: 38px;
 }
 
 button:hover:not(:disabled) {
-  border-color: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.28);
   background: #332d28;
   transform: translateY(-1px);
 }
 
 button:active:not(:disabled) {
   transform: translateY(1px);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
 }
 
 button:disabled {
@@ -486,12 +522,12 @@ button.primary {
   border: 1px solid rgba(240, 193, 0, 0.4);
   color: #0c0a09;
   font-weight: 600;
-  box-shadow: 0 3px 12px rgba(210, 122, 0, 0.35);
+  box-shadow: 0 4px 14px rgba(210, 122, 0, 0.35);
 }
 
 button.primary:hover:not(:disabled) {
   background: var(--primary-gradient-hover);
-  box-shadow: 0 4px 18px rgba(240, 193, 0, 0.45);
+  box-shadow: 0 4px 20px rgba(240, 193, 0, 0.48);
   border-color: rgba(240, 193, 0, 0.6);
 }
 
@@ -506,53 +542,75 @@ button.danger:hover:not(:disabled) {
   border-color: var(--danger);
 }
 
-/* Composer with Fauzec styling */
+button.ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--muted);
+  padding: 4px 8px;
+  min-height: auto;
+}
+
+button.ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+}
+
+/* Composer Form */
+.composer-form {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
 .composer {
   display: flex;
   gap: 10px;
-  padding: 16px 28px 24px;
+  padding: 16px 28px 22px;
   border-top: 1px solid var(--border);
   background: rgba(12, 10, 9, 0.85);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   align-items: center;
+  flex-shrink: 0;
 }
 
 input[type="text"] {
   flex: 1;
   font-family: inherit;
   font-size: 14.5px;
-  padding: 12px 16px;
+  padding: 12px 18px;
   border-radius: var(--radius);
   border: 1px solid var(--border);
   background: var(--panel-card);
   color: var(--text);
   outline: none;
-  transition: all 0.15s ease;
-  backdrop-filter: blur(8px);
+  min-height: 48px;
+  transition: all 0.16s ease;
+  backdrop-filter: blur(10px);
 }
 
 input[type="text"]::placeholder {
   color: var(--muted-dark);
 }
 
-input[type="text"]:focus {
+input[type="text"]:focus-visible {
   border-color: var(--brand);
   background: var(--panel);
-  box-shadow: 0 0 0 3px rgba(240, 193, 0, 0.18);
+  box-shadow: 0 0 0 3px rgba(240, 193, 0, 0.2);
 }
 
-/* Sidebar with Fauzec card components */
+/* Sidebar Dashboard */
 .sidebar {
   border-left: 1px solid var(--border);
-  background: rgba(18, 16, 14, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(18, 16, 14, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   padding: 22px 20px;
   display: flex;
   flex-direction: column;
   gap: 18px;
   overflow-y: auto;
+  height: 100vh;
 }
 
 .section {
@@ -560,12 +618,13 @@ input[type="text"]:focus {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  transition: border-color 0.15s ease;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .section:hover {
   border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: var(--shadow-md);
 }
 
 .section h2 {
@@ -583,7 +642,7 @@ input[type="text"]:focus {
 
 .section h2 .pill-tag {
   font-size: 10px;
-  padding: 1px 6px;
+  padding: 2px 7px;
   border-radius: var(--radius-pill);
   background: rgba(255, 255, 255, 0.06);
   color: var(--muted);
@@ -599,14 +658,14 @@ input[type="text"]:focus {
 }
 
 .stat-box {
-  background: rgba(12, 10, 9, 0.5);
+  background: rgba(12, 10, 9, 0.55);
   border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
 }
 
 .stat-label {
-  font-size: 10.5px;
+  font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--muted-dark);
@@ -614,7 +673,7 @@ input[type="text"]:focus {
 }
 
 .stat-val {
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 600;
   font-family: var(--font-mono);
   color: var(--text);
@@ -625,6 +684,7 @@ input[type="text"]:focus {
 }
 
 .stat-val.ok { color: var(--accent); }
+.stat-val.brand { color: var(--brand-light); }
 .stat-val.warn { color: var(--warn); }
 .stat-val.danger { color: var(--danger); }
 
@@ -659,14 +719,15 @@ input[type="text"]:focus {
 
 .model-switch button {
   flex: 1;
-  font-size: 11.5px;
+  font-size: 11px;
   font-family: var(--font-mono);
-  padding: 6px 10px;
+  padding: 6px 8px;
   border-radius: 6px;
   border: 1px solid transparent;
   background: transparent;
   color: var(--muted);
   box-shadow: none;
+  min-height: 32px;
 }
 
 .model-switch button:hover {
@@ -688,7 +749,7 @@ input[type="text"]:focus {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  max-height: 280px;
+  max-height: 290px;
   overflow-y: auto;
   padding-right: 4px;
 }
@@ -707,7 +768,7 @@ input[type="text"]:focus {
 
 .log-row:hover {
   background: rgba(12, 10, 9, 0.85);
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.14);
 }
 
 .log-row.ok { border-left-color: var(--accent); }
@@ -726,7 +787,7 @@ input[type="text"]:focus {
   font-weight: 600;
   text-transform: uppercase;
   font-size: 10px;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 
 .log-row .sum {
@@ -738,6 +799,26 @@ input[type="text"]:focus {
 .log-row .meta {
   color: var(--muted-dark);
   font-size: 10px;
+}
+
+.blob-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--brand-light);
+  background: transparent;
+  border: none;
+  padding: 2px 4px;
+  cursor: pointer;
+  border-radius: 4px;
+  min-height: auto;
+}
+
+.blob-copy-btn:hover {
+  background: rgba(240, 193, 0, 0.12);
+  transform: none;
 }
 
 .empty-note {
@@ -758,6 +839,16 @@ a:hover {
   color: #fff;
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+/* Spin animation for thinking state */
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* Ensure Next.js dev overlay is completely hidden */

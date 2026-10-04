@@ -42,7 +42,9 @@ export default function Page() {
   const [role, setRole] = useState<"primary" | "secondary">("primary");
   const [forgetArmed, setForgetArmed] = useState(false);
   const [retired, setRetired] = useState<string[]>([]);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     bottom.current?.scrollIntoView({ behavior: "smooth" });
@@ -58,6 +60,16 @@ export default function Page() {
   }, []);
 
   useEffect(() => { void loadHealth(); }, [loadHealth]);
+
+  const copyToClipboard = async (text: string, id: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {
+      /* fallback */
+    }
+  };
 
   const send = async (explicitText?: string) => {
     const text = (explicitText ?? input).trim();
@@ -101,7 +113,13 @@ export default function Page() {
       setInput(text);
     } finally {
       setBusy(false);
+      setTimeout(() => inputRef.current?.focus(), 50);
     }
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    void send();
   };
 
   const confirm = async (item: PendingItem) => {
@@ -168,11 +186,11 @@ export default function Page() {
   return (
     <div className="shell">
       <main className="main">
-        <header className="masthead">
+        <header className="masthead" role="banner">
           <div className="brand-row">
             <div className="brand-title-wrap">
               <div className="brand-glyph" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 2L2 7l10 5 10-5-10-5z" />
                   <path d="M2 17l10 5 10-5" />
                   <path d="M2 12l10 5 10-5" />
@@ -186,27 +204,27 @@ export default function Page() {
               </div>
             </div>
             
-            <div className="badges">
-              <span className={`badge ${modeClass}`}>
-                <span className="status-dot"></span>
+            <div className="badges" aria-label="System status">
+              <span className={`badge ${modeClass}`} title="Relayer execution environment mode">
+                <span className="status-dot" aria-hidden="true"></span>
                 relayer: {mode ?? "unknown"}
               </span>
-              <span className="badge brand">
-                <span className="status-dot"></span>
+              <span className="badge brand" title="Active memory namespace generation">
+                <span className="status-dot" aria-hidden="true"></span>
                 {health?.namespace ?? "identity"}
               </span>
-              <span className="badge">
+              <span className="badge" title="Committed memories count">
                 {writes} writes
               </span>
               {drops > 0 && (
-                <span className="badge warn">
-                  <span className="status-dot"></span>
+                <span className="badge warn" title="Silent blob retrieval drops reported by SDK">
+                  <span className="status-dot" aria-hidden="true"></span>
                   {drops} dropped
                 </span>
               )}
               {retired.length > 0 && (
-                <span className="badge danger">
-                  <span className="status-dot"></span>
+                <span className="badge danger" title="Retired isolated generations">
+                  <span className="status-dot" aria-hidden="true"></span>
                   {retired.length} retired gen
                 </span>
               )}
@@ -220,11 +238,11 @@ export default function Page() {
           </p>
         </header>
 
-        <div className="chat">
+        <section className="chat" aria-label="Conversation history" aria-live="polite">
           {messages.length === 0 && (
             <div className="empty-hero">
               <div className="empty-hero-icon" aria-hidden="true">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                   <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                 </svg>
@@ -234,34 +252,43 @@ export default function Page() {
                 Tell the agent about yourself. It will propose memories, and deterministic code
                 — not the model — verifies citations and gates what gets committed on-chain.
               </p>
-              <div className="quick-prompts">
+              <div className="quick-prompts" aria-label="Sample prompts">
                 <button
                   type="button"
                   className="quick-prompt-btn"
-                  onClick={() => setInput("I'm a Rust engineer working on Sui DeFi protocols.")}
+                  onClick={() => {
+                    setInput("I'm a Rust engineer working on Sui DeFi protocols.");
+                    inputRef.current?.focus();
+                  }}
                 >
-                  "I&apos;m a Rust engineer working on Sui DeFi"
+                  <span>⚡</span> &quot;I&apos;m a Rust engineer working on Sui DeFi&quot;
                 </button>
                 <button
                   type="button"
                   className="quick-prompt-btn"
-                  onClick={() => setInput("I prefer concise bullet points and zero conversational fluff.")}
+                  onClick={() => {
+                    setInput("I prefer concise bullet points and zero conversational fluff.");
+                    inputRef.current?.focus();
+                  }}
                 >
-                  "I prefer concise bullet points"
+                  <span>📝</span> &quot;I prefer concise bullet points&quot;
                 </button>
                 <button
                   type="button"
                   className="quick-prompt-btn"
-                  onClick={() => setInput("What do you remember about my background and goals?")}
+                  onClick={() => {
+                    setInput("What do you remember about my background and preferences?");
+                    inputRef.current?.focus();
+                  }}
                 >
-                  "What do you remember about me?"
+                  <span>🔍</span> &quot;What do you remember about me?&quot;
                 </button>
               </div>
             </div>
           )}
 
           {messages.map((m, i) => (
-            <div key={i} className={`msg ${m.role}`}>
+            <article key={i} className={`msg ${m.role}`}>
               <div className="who">
                 {m.role === "user" ? (
                   <span>you</span>
@@ -276,7 +303,7 @@ export default function Page() {
               <div className="body">{m.text}</div>
 
               {m.citations && m.citations.length > 0 && (
-                <div className="cites">
+                <div className="cites" aria-label="Cited memories">
                   {m.citations.map((c) => (
                     <span key={c.id} className="cite" title={c.content}>
                       <span className="cite-icon" aria-hidden="true">🏷️</span>
@@ -287,9 +314,9 @@ export default function Page() {
               )}
 
               {m.pending?.map((p) => (
-                <div key={p.id} className="pending">
+                <div key={p.id} className="pending" role="alert">
                   <div className="label">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                       <circle cx="12" cy="12" r="10"></circle>
                       <line x1="12" y1="8" x2="12" y2="12"></line>
                       <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -298,10 +325,10 @@ export default function Page() {
                   </div>
                   <div className="text">{p.content}</div>
                   <div className="actions">
-                    <button className="primary" onClick={() => void confirm(p)}>
+                    <button type="button" className="primary" onClick={() => void confirm(p)}>
                       Remember this
                     </button>
-                    <button onClick={() => setMessages((m2) => m2.map((x, j) => (j === i ? { ...x, pending: x.pending?.filter((y) => y.id !== p.id) } : x)))}>
+                    <button type="button" onClick={() => setMessages((m2) => m2.map((x, j) => (j === i ? { ...x, pending: x.pending?.filter((y) => y.id !== p.id) } : x)))}>
                       Decline
                     </button>
                   </div>
@@ -319,47 +346,68 @@ export default function Page() {
                   )}
                 </div>
               )}
-            </div>
+            </article>
           ))}
           <div ref={bottom} />
-        </div>
+        </section>
 
         {error && (
           <div style={{ padding: "0 28px 12px" }}>
-            <span className="badge danger">
+            <span className="badge danger" role="alert">
               <span className="status-dot"></span>
               {error}
             </span>
           </div>
         )}
 
-        <div className="composer">
-          <input
-            type="text"
-            value={input}
-            placeholder="Type a message or fact to remember…"
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") void send(); }}
-            disabled={busy}
-          />
-          <button className="primary" onClick={() => void send()} disabled={busy || !input.trim()}>
-            {busy ? (
-              "Thinking…"
-            ) : (
-              <>
-                <span>Send</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="22" y1="2" x2="11" y2="13"></line>
-                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                </svg>
-              </>
-            )}
-          </button>
-        </div>
+        <form className="composer-form" onSubmit={handleFormSubmit}>
+          <div className="composer">
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              placeholder="Type a message or fact to remember…"
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+                  e.preventDefault();
+                  void send();
+                }
+              }}
+              disabled={busy}
+              autoComplete="off"
+              spellCheck="false"
+              aria-label="Message to agent"
+            />
+            <button
+              type="submit"
+              className="primary"
+              disabled={busy || !input.trim()}
+              aria-label="Send message"
+            >
+              {busy ? (
+                <>
+                  <svg className="spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                  </svg>
+                  <span>Thinking…</span>
+                </>
+              ) : (
+                <>
+                  <span>Send</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                  </svg>
+                </>
+              )}
+            </button>
+          </div>
+        </form>
       </main>
 
-      <aside className="sidebar">
-        <div className="section">
+      <aside className="sidebar" aria-label="System telemetry and control">
+        <section className="section">
           <h2>
             <span>Chain Audit</span>
             <span className="pill-tag">Onchain receipt</span>
@@ -400,9 +448,9 @@ export default function Page() {
               </a>
             </p>
           )}
-        </div>
+        </section>
 
-        <div className="section">
+        <section className="section">
           <h2>
             <span>Relayer Provenance</span>
             <span className="pill-tag">Public relayer</span>
@@ -414,27 +462,37 @@ export default function Page() {
             <dt>api</dt><dd>{health?.provenance?.apiVersion ?? "—"}</dd>
             <dt>build</dt><dd>{health?.provenance?.buildCommit?.slice(0, 10) ?? "—"}</dd>
           </dl>
-        </div>
+        </section>
 
-        <div className="section">
+        <section className="section">
           <h2>
             <span>Reasoning Engine</span>
             <span className="pill-tag">Portability (H2)</span>
           </h2>
-          <div className="model-switch">
-            <button className={role === "primary" ? "active" : ""} onClick={() => setRole("primary")}>
+          <div className="model-switch" role="group" aria-label="Model switcher">
+            <button
+              type="button"
+              className={role === "primary" ? "active" : ""}
+              onClick={() => setRole("primary")}
+              aria-pressed={role === "primary"}
+            >
               primary (gpt-oss-20b)
             </button>
-            <button className={role === "secondary" ? "active" : ""} onClick={() => setRole("secondary")}>
+            <button
+              type="button"
+              className={role === "secondary" ? "active" : ""}
+              onClick={() => setRole("secondary")}
+              aria-pressed={role === "secondary"}
+            >
               secondary (llama-3.3-70b)
             </button>
           </div>
           <p style={{ margin: "8px 0 0", fontSize: 12, color: "var(--muted)", lineHeight: 1.45 }}>
             Switching the model proves identity follows your Walrus key rather than provider weights.
           </p>
-        </div>
+        </section>
 
-        <div className="section">
+        <section className="section">
           <h2>
             <span>Revocability / Forget</span>
             <span className="pill-tag">Namespace rotation</span>
@@ -445,12 +503,20 @@ export default function Page() {
                 Retires current namespace generation. Recall is scoped by owner + namespace, so old memories become unreachable — SEAL-encrypted blobs persist on Walrus until epoch lapse.
               </p>
               <div style={{ display: "flex", gap: 8 }}>
-                <button className="danger" onClick={() => void forget()}>Confirm Forget</button>
-                <button onClick={() => setForgetArmed(false)}>Cancel</button>
+                <button type="button" className="danger" onClick={() => void forget()}>
+                  Confirm Forget
+                </button>
+                <button type="button" onClick={() => setForgetArmed(false)}>
+                  Cancel
+                </button>
               </div>
             </div>
           ) : (
-            <button onClick={() => setForgetArmed(true)} style={{ width: "100%" }}>
+            <button
+              type="button"
+              onClick={() => setForgetArmed(true)}
+              style={{ width: "100%" }}
+            >
               Rotate generation (Forget…)
             </button>
           )}
@@ -459,14 +525,14 @@ export default function Page() {
               Retired: {retired.join(", ")}
             </p>
           )}
-        </div>
+        </section>
 
-        <div className="section">
+        <section className="section">
           <h2>
             <span>Evidence Audit ({evidence.length})</span>
             <span className="pill-tag">Lineage</span>
           </h2>
-          <div className="log">
+          <div className="log" role="log">
             {evidence.length === 0 && (
               <p className="empty-note">No operations in this session yet.</p>
             )}
@@ -477,15 +543,24 @@ export default function Page() {
                   <span className="meta">{e.latencyMs}ms</span>
                 </div>
                 {e.blobId && (
-                  <div className="meta" style={{ fontFamily: "var(--font-mono)", color: "var(--brand-light)" }}>
-                    blob: {e.blobId.slice(0, 16)}…
+                  <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2 }}>
+                    <span className="meta">blob:</span>
+                    <button
+                      type="button"
+                      className="blob-copy-btn"
+                      onClick={() => void copyToClipboard(e.blobId!, e.id)}
+                      title="Click to copy full blob ID"
+                    >
+                      {e.blobId.slice(0, 14)}…
+                      {copiedId === e.id ? "✓ copied" : "📋"}
+                    </button>
                   </div>
                 )}
                 <div className="sum">{e.resultSummary}</div>
               </div>
             ))}
           </div>
-        </div>
+        </section>
       </aside>
     </div>
   );

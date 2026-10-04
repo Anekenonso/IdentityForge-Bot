@@ -1,0 +1,76 @@
+{
+  "runAt": "2026-10-04T21:47:06.436Z",
+  "seed": "eval/seed_user_a.json",
+  "seedName": "Alex Rivera",
+  "probes": 1,
+  "models": {
+    "primary": "openai/gpt-oss-20b",
+    "secondary": "meta-llama/llama-3.3-70b-instruct",
+    "judge": "openai/gpt-oss-120b"
+  },
+  "provenance": {
+    "relayer": "https://relayer.memory.walrus.xyz",
+    "mode": "production",
+    "writeReady": true,
+    "status": "ok",
+    "apiVersion": "1.0.0",
+    "relayerVersion": "0.1.0",
+    "buildCommit": null,
+    "promptVersions": {
+      "extract": "extract.v6",
+      "ask": "ask.v2"
+    },
+    "capturedAt": "2026-10-04T21:47:00.409Z"
+  },
+  "restore": {
+    "restored": 0,
+    "skipped": 44,
+    "failed": 0,
+    "total": 44,
+    "truncated": true,
+    "namespace": "eval_a",
+    "owner": "0x44b35b6f89b216cbfcf3aaaa57aee2621544b931fa599d16365e77bb1944131d",
+    "latencyMs": 5300
+  },
+  "methodologyNote": "C1 (pre-wipe, same session) was dropped: this app reconstructs from Walrus on every turn, so there is no warm session state and C1 would equal C2. The no-memory control C0 serves as the reference instead.",
+  "conditions": {
+    "C2": {
+      "label": "fidelity (primary model)",
+      "namespace": "eval_a",
+      "role": "primary",
+      "summary": {
+        "recallPct": 100,
+        "personaPct": 0,
+        "goalPct": 0,
+        "fidelityPct": 100,
+        "stalePct": 0,
+        "hallucinationPct": 0,
+        "leakPct": 100,
+        "snapshotFoundPct": 100,
+        "counts": {
+          "direct": 1,
+          "persona": 0,
+          "goal": 0,
+          "trap": 0,
+          "negative": 0
+        }
+      },
+      "outcomes": [
+        {
+          "probeId": "r01",
+          "kind": "direct",
+          "question": "What is my name?",
+          "reply": "Your name is Alex Rivera. (cited_ids: 0d843f4f-1fe7-4b9b-98e1-f57f103a38ec, f925774c-4b85-4636-9412-cbd95d77bfbf, b1ee29cd-1315-49d8-b7e3-0f22e905aa5a, 6fa4d152-6c11-41ce-90cc-60efbf325a85, 4df21a31-60f0-40f3-92d2-1b54293ae40f, 9c982333-f70a-48c2-9eec-78cef0e9a851, 73a36b9f-2a81-4732-b0c7-25c4f7ed9c5b, 4c6a0e85-f83e-4e15-a813-ca39b0d90a56, 86021ae1-1b0c-409d-8926-0133c043a7ab, 97588a14-1c0c-4cd1-829e-6ca0ce7cf857, 363cc034-cd60-46b5-a9e5-5366e0edb8c4, dcecd56a-53e3-4821-8a9f-3bf594523b7a, fb2f11fb-5147-4c0c-8917-38658dc45372, 4ed5ae87-a1b2-4467-b523-343d15eebf53, c6a757be-6c72-4b97-9f76-caf6e2718897, ef1e2868-c4e1-4fb9-951d-11b0de50311e, 5abda56e-fb5b-4f1b-bfbd-20d6d332daf6, 7be03b52-447c-43ec-acb9-f80a81969e48, 73c6bc35-3b01-49e3-bde4-935bf9f32243, 7cd32b85-8f90-4bb8-9554-d8b674d6912f, f2e17b5b-d088-4be2-b3ae-989747c99426, 5cd889dc-cf25-4e0d-95b2-c51d387a69ea, 454d4cd7-8cc2-47a7-a2ec-7125bff01a7b, f0cfca24-b92c-48cb-adf7-85a93c8bd791, c139b7ea-1f82-4bc3-b10a-8c65ebc0f400, 0efc12e1-9c74-40da-a5e7-5fc66a51bcdc, 7b0a8481-be4a-4e83-a5f4-ff4d78048aa6, 1fca92f2-e83e-4ea0-95a7-9bc32c8a65a0, 8a0a99d3-2eb7-40e3-b461-242dc93bcbb1, 01787d52-62fc-417f-a27e-b52ea5877bf8, 450df8f0-1aa1-4778-ab12-0333dab87473, 28f60446-3470-46a2-9787-8f8a209025b3, ba091194-3e5a-4db0-be9f-c1f55a7f7bc5, 70924e83-16d3-4493-b43d-92c3a003e151)",
+          "score": 2,
+          "maxScore": 2,
+          "assertedForbidden": false,
+          "admittedIgnorance": false,
+          "reason": "Correctly identified name as Alex Rivera.",
+          "citations": 34,
+          "snapshotFound": true,
+          "latencyMs": 68514
+        }
+      ]
+    }
+  }
+}

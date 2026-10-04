@@ -77,7 +77,7 @@ const ENV_BY_ROLE: Record<LlmRole, { provider: string; model: string }> = {
   },
   secondary: {
     provider: process.env.LLM_SECONDARY_PROVIDER ?? "groq",
-    model: process.env.LLM_SECONDARY_MODEL ?? "llama-3.3-70b-versatile",
+    model: process.env.LLM_SECONDARY_MODEL ?? "openai/gpt-oss-120b",
   },
   judge: {
     provider: process.env.LLM_JUDGE_PROVIDER ?? "gemini",
@@ -114,6 +114,12 @@ export function readLlmConfig(role: LlmRole): LlmConfig {
     apiKey,
     baseUrl: process.env.OPENAI_BASE_URL ?? defaults?.baseUrl,
   };
+}
+
+export function requestMaxTokens(config: LlmConfig): number {
+  const override = Number(process.env.LLM_MAX_TOKENS ?? process.env.OPENAI_MAX_TOKENS ?? "");
+  if (Number.isFinite(override) && override > 0) return override;
+  return config.provider === "anthropic" ? 8192 : 4000;
 }
 
 /**
@@ -288,10 +294,10 @@ async function callOpenAiCompatible<S extends z.ZodType>(
         },
         body: JSON.stringify({
           model: config.model,
-          // Gemini 3.x models think by default and count those tokens against
-          // max_tokens — a small budget returns finish_reason "length" with an
-          // empty content field. Verified: 50 tokens produced no text at all.
-          max_tokens: 8192,
+          // OpenRouter and some free-tier providers enforce small caps. Keep the
+          // request under the funded ceiling rather than hard-coding a large token
+          // budget that fails mid-eval for valid API keys.
+          max_tokens: requestMaxTokens(config),
           // Real schema enforcement, not just "return some JSON". A judge whose
           // output fails to parse scores 0, so a loose response format would
           // quietly corrupt every number in the results.

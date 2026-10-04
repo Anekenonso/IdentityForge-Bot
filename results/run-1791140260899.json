@@ -1,0 +1,123 @@
+{
+  "runAt": "2026-10-04T18:54:36.804Z",
+  "seed": "eval/seed_user_a.json",
+  "seedName": "Alex Rivera",
+  "probes": 5,
+  "models": {
+    "primary": "openai/gpt-6.1-sol",
+    "secondary": "openai/gpt-oss-120b",
+    "judge": "google/gemini-2.5-flash-lite"
+  },
+  "provenance": {
+    "relayer": "https://relayer.memory.walrus.xyz",
+    "mode": null,
+    "writeReady": null,
+    "status": "error: fetch failed",
+    "apiVersion": null,
+    "relayerVersion": null,
+    "buildCommit": null,
+    "promptVersions": {
+      "extract": null,
+      "ask": null
+    },
+    "capturedAt": "2026-10-04T18:54:26.093Z"
+  },
+  "restore": null,
+  "methodologyNote": "C1 (pre-wipe, same session) was dropped: this app reconstructs from Walrus on every turn, so there is no warm session state and C1 would equal C2. The no-memory control C0 serves as the reference instead.",
+  "conditions": {
+    "C3": {
+      "label": "portability (model swap)",
+      "namespace": "eval_a",
+      "role": "secondary",
+      "summary": {
+        "recallPct": 60,
+        "personaPct": 0,
+        "goalPct": 0,
+        "fidelityPct": 60,
+        "stalePct": 0,
+        "hallucinationPct": 0,
+        "leakPct": 60,
+        "snapshotFoundPct": 60,
+        "counts": {
+          "direct": 5,
+          "persona": 0,
+          "goal": 0,
+          "trap": 0,
+          "negative": 0
+        }
+      },
+      "outcomes": [
+        {
+          "probeId": "r01",
+          "kind": "direct",
+          "question": "What is my name?",
+          "reply": "I have no stored identity yet. Starting fresh — tell me about yourself.",
+          "score": 0,
+          "maxScore": 2,
+          "assertedForbidden": false,
+          "admittedIgnorance": true,
+          "reason": "The assistant incorrectly stated it had no stored identity when the stored memory clearly indicates the user's name is Alex Rivera.",
+          "citations": 0,
+          "snapshotFound": false,
+          "latencyMs": 44701
+        },
+        {
+          "probeId": "r02",
+          "kind": "direct",
+          "question": "What do I do for a living?",
+          "reply": "I have no stored identity yet. Starting fresh — tell me about yourself.",
+          "score": 0,
+          "maxScore": 2,
+          "assertedForbidden": false,
+          "admittedIgnorance": true,
+          "reason": "The assistant admits ignorance but does not retrieve the stored memory.",
+          "citations": 0,
+          "snapshotFound": false,
+          "latencyMs": 65779
+        },
+        {
+          "probeId": "r03",
+          "kind": "direct",
+          "question": "Which programming language do I write new code in?",
+          "reply": "You write new code in TypeScript.",
+          "score": 2,
+          "maxScore": 2,
+          "assertedForbidden": false,
+          "admittedIgnorance": false,
+          "reason": "The assistant correctly identified the programming language as TypeScript.",
+          "citations": 2,
+          "snapshotFound": true,
+          "latencyMs": 39901
+        },
+        {
+          "probeId": "r04",
+          "kind": "direct",
+          "question": "Which editor do I use?",
+          "reply": "You use Neovim as your primary editor.",
+          "score": 2,
+          "maxScore": 2,
+          "assertedForbidden": false,
+          "admittedIgnorance": false,
+          "reason": "The assistant correctly identifies Neovim as the user's editor.",
+          "citations": 1,
+          "snapshotFound": true,
+          "latencyMs": 17592
+        },
+        {
+          "probeId": "r05",
+          "kind": "direct",
+          "question": "Which shell do I use?",
+          "reply": "You use fish as your shell.",
+          "score": 2,
+          "maxScore": 2,
+          "assertedForbidden": false,
+          "admittedIgnorance": false,
+          "reason": "The assistant directly answered the question with the gold answer.",
+          "citations": 2,
+          "snapshotFound": true,
+          "latencyMs": 16118
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "runAt": "2026-10-04T19:05:13.859Z",
+  "seed": "eval/seed_user_a.json",
+  "seedName": "Alex Rivera",
+  "probes": 5,
+  "models": {
+    "primary": "openai/gpt-6.1-sol",
+    "secondary": "meta-llama/llama-3.3-70b-instruct",
+    "judge": "google/gemini-2.5-flash-lite"
+  },
+  "provenance": {
+    "relayer": "https://relayer.memory.walrus.xyz",
+    "mode": "production",
+    "writeReady": true,
+    "status": "ok",
+    "apiVersion": "1.0.0",
+    "relayerVersion": "0.1.0",
+    "buildCommit": null,
+    "promptVersions": {
+      "extract": "extract.v6",
+      "ask": "ask.v2"
+    },
+    "capturedAt": "2026-10-04T19:04:53.288Z"
+  },
+  "restore": {
+    "restored": 0,
+    "skipped": 44,
+    "failed": 0,
+    "total": 44,
+    "truncated": true,
+    "namespace": "eval_a",
+    "owner": "0x44b35b6f89b216cbfcf3aaaa57aee2621544b931fa599d16365e77bb1944131d",
+    "latencyMs": 10992
+  },
+  "methodologyNote": "C1 (pre-wipe, same session) was dropped: this app reconstructs from Walrus on every turn, so there is no warm session state and C1 would equal C2. The no-memory control C0 serves as the reference instead.",
+  "conditions": {
+    "C3": {
+      "label": "portability (model swap)",
+      "namespace": "eval_a",
+      "role": "secondary",
+      "summary": {
+        "recallPct": 100,
+        "personaPct": 0,
+        "goalPct": 0,
+        "fidelityPct": 100,
+        "stalePct": 0,
+        "hallucinationPct": 0,
+        "leakPct": 100,
+        "snapshotFoundPct": 100,
+        "counts": {
+          "direct": 5,
+          "persona": 0,
+          "goal": 0,
+          "trap": 0,
+          "negative": 0
+        }
+      },
+      "outcomes": [
+        {
+          "probeId": "r01",
+          "kind": "direct",
+          "question": "What is my name?",
+          "reply": "Your name is Alex Rivera [f925774c-4b85-4636-9412-cbd95d77bfbf, b1ee29cd-1315-49d8-b7e3-0f22e905aa5a].",
+          "score": 2,
+          "maxScore": 2,
+          "assertedForbidden": false,
+          "admittedIgnorance": false,
+          "reason": "The assistant correctly retrieved and stated the user's name from the provided memory.",
+          "citations": 2,
+          "snapshotFound": true,
+          "latencyMs": 24586
+        },
+        {
+          "probeId": "r02",
+          "kind": "direct",
+          "question": "What do I do for a living?",
+          "reply": "You are a senior Rust engineer on Sui [0d843f4f-1fe7-4b9b-98e1-f57f103a38ec].",
+          "score": 2,
+          "maxScore": 2,
+          "assertedForbidden": false,
+          "admittedIgnorance": false,
+          "reason": "The assistant's reply directly and accurately conveys the gold answer.",
+          "citations": 1,
+          "snapshotFound": true,
+          "latencyMs": 48081
+        },
+        {
+          "probeId": "r03",
+          "kind": "direct",
+          "question": "Which programming language do I write new code in?",
+          "reply": "You write new code in TypeScript [id=c4af0f3a-b17f-4b92-b26b-31d341e96f87]",
+          "score": 2,
+          "maxScore": 2,
+          "assertedForbidden": false,
+          "admittedIgnorance": false,
+          "reason": "The assistant correctly identified TypeScript as the programming language for new code.",
+          "citations": 2,
+          "snapshotFound": true,
+          "latencyMs": 43187
+        },
+        {
+          "probeId": "r04",
+          "kind": "direct",
+          "question": "Which editor do I use?",
+          "reply": "You use Neovim [id=0d843f4f-1fe7-4b9b-98e1-f57f103a38ec]",
+          "score": 2,
+          "maxScore": 2,
+          "assertedForbidden": false,
+          "admittedIgnorance": false,
+          "reason": "The assistant correctly identified the editor as Neovim.",
+          "citations": 1,
+          "snapshotFound": true,
+          "latencyMs": 41921
+        },
+        {
+          "probeId": "r05",
+          "kind": "direct",
+          "question": "Which shell do I use?",
+          "reply": "You use fish as a shell. [12a9d7db-6549-4fda-a85f-204cb2fd0106, aa953f91-ce4d-4197-8247-4f6fa05b109c]",
+          "score": 2,
+          "maxScore": 2,
+          "assertedForbidden": false,
+          "admittedIgnorance": false,
+          "reason": "The assistant directly answers the question using the gold standard answer.",
+          "citations": 2,
+          "snapshotFound": true,
+          "latencyMs": 54069
+        }
+      ]
+    }
+  }
+}

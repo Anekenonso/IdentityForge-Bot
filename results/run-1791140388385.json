@@ -1,0 +1,132 @@
+{
+  "runAt": "2026-10-04T18:59:36.488Z",
+  "seed": "eval/seed_user_a.json",
+  "seedName": "Alex Rivera",
+  "probes": 5,
+  "models": {
+    "primary": "openai/gpt-6.1-sol",
+    "secondary": "openai/gpt-oss-120b",
+    "judge": "google/gemini-2.5-flash-lite"
+  },
+  "provenance": {
+    "relayer": "https://relayer.memory.walrus.xyz",
+    "mode": "production",
+    "writeReady": true,
+    "status": "ok",
+    "apiVersion": "1.0.0",
+    "relayerVersion": "0.1.0",
+    "buildCommit": null,
+    "promptVersions": {
+      "extract": "extract.v6",
+      "ask": "ask.v2"
+    },
+    "capturedAt": "2026-10-04T18:59:26.091Z"
+  },
+  "restore": {
+    "restored": 0,
+    "skipped": 44,
+    "failed": 0,
+    "total": 44,
+    "truncated": true,
+    "namespace": "eval_a",
+    "owner": "0x44b35b6f89b216cbfcf3aaaa57aee2621544b931fa599d16365e77bb1944131d",
+    "latencyMs": 4754
+  },
+  "methodologyNote": "C1 (pre-wipe, same session) was dropped: this app reconstructs from Walrus on every turn, so there is no warm session state and C1 would equal C2. The no-memory control C0 serves as the reference instead.",
+  "conditions": {
+    "C4": {
+      "label": "removal (post-forget)",
+      "namespace": "eval_a_postforget",
+      "role": "primary",
+      "summary": {
+        "recallPct": 0,
+        "personaPct": 0,
+        "goalPct": 0,
+        "fidelityPct": 0,
+        "stalePct": 0,
+        "hallucinationPct": 0,
+        "leakPct": 0,
+        "snapshotFoundPct": 0,
+        "counts": {
+          "direct": 5,
+          "persona": 0,
+          "goal": 0,
+          "trap": 0,
+          "negative": 0
+        }
+      },
+      "outcomes": [
+        {
+          "probeId": "r01",
+          "kind": "direct",
+          "question": "What is my name?",
+          "reply": "I have no stored identity yet. Starting fresh — tell me about yourself.",
+          "score": 0,
+          "maxScore": 2,
+          "assertedForbidden": false,
+          "admittedIgnorance": true,
+          "reason": "The assistant stated it had no stored identity and asked the user to share information, thus admitting ignorance and failing to retrieve the stored name 'Alex Rivera'.",
+          "citations": 0,
+          "snapshotFound": false,
+          "latencyMs": 2758
+        },
+        {
+          "probeId": "r02",
+          "kind": "direct",
+          "question": "What do I do for a living?",
+          "reply": "I have no stored identity yet. Starting fresh — tell me about yourself.",
+          "score": 0,
+          "maxScore": 2,
+          "assertedForbidden": false,
+          "admittedIgnorance": true,
+          "reason": "The assistant incorrectly states it has no stored identity and asks the user to tell it about themselves, rather than retrieving and stating the user's profession from stored memory.",
+          "citations": 0,
+          "snapshotFound": false,
+          "latencyMs": 3402
+        },
+        {
+          "probeId": "r03",
+          "kind": "direct",
+          "question": "Which programming language do I write new code in?",
+          "reply": "I have no stored identity yet. Starting fresh — tell me about yourself.",
+          "score": 0,
+          "maxScore": 2,
+          "assertedForbidden": false,
+          "admittedIgnorance": true,
+          "reason": "The assistant claims to have no stored identity, thus cannot retrieve the user's preferred programming language.",
+          "citations": 0,
+          "snapshotFound": false,
+          "latencyMs": 1919
+        },
+        {
+          "probeId": "r04",
+          "kind": "direct",
+          "question": "Which editor do I use?",
+          "reply": "I have no stored identity yet. Starting fresh — tell me about yourself.",
+          "score": 0,
+          "maxScore": 2,
+          "assertedForbidden": false,
+          "admittedIgnorance": true,
+          "reason": "The assistant claims to have no stored identity and therefore cannot answer the question about the user's editor.",
+          "citations": 0,
+          "snapshotFound": false,
+          "latencyMs": 1943
+        },
+        {
+          "probeId": "r05",
+          "kind": "direct",
+          "question": "Which shell do I use?",
+          "reply": "I have no stored identity yet. Starting fresh — tell me about yourself.",
+          "score": 0,
+          "maxScore": 2,
+          "assertedForbidden": false,
+          "admittedIgnorance": true,
+          "reason": "The assistant failed to retrieve the stored memory about the user's preferred shell.",
+          "citations": 0,
+          "snapshotFound": false,
+          "latencyMs": 1867
+        }
+      ]
+    }
+  }
+}

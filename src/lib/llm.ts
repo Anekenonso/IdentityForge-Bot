@@ -31,25 +31,64 @@ export interface LlmConfig {
   baseUrl?: string;
 }
 
+/**
+ * Free-tier-friendly providers. Both speak the OpenAI-compatible wire format, so
+ * they reuse one code path; the difference is only the key and the base URL.
+ *
+ * Gemini is the default agent provider because its free tier is generous enough
+ * for a full eval run, and Groq supplies a genuinely different model family for
+ * the H2 swap — a portability result between Gemini and Llama is worth far more
+ * than one between two models from the same lineage.
+ */
+const PROVIDER_DEFAULTS: Record<string, { keyVar: string; baseUrl: string; label: string }> = {
+  anthropic: { keyVar: "ANTHROPIC_API_KEY", baseUrl: "", label: "Anthropic" },
+  gemini: {
+    keyVar: "GEMINI_API_KEY",
+    baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai",
+    label: "Google AI Studio (free tier)",
+  },
+  groq: {
+    keyVar: "GROQ_API_KEY",
+    baseUrl: "https://api.groq.com/openai/v1",
+    label: "Groq (free tier)",
+  },
+  openrouter: {
+    keyVar: "OPENROUTER_API_KEY",
+    baseUrl: "https://openrouter.ai/api/v1",
+    label: "OpenRouter",
+  },
+  openai: { keyVar: "OPENAI_API_KEY", baseUrl: "https://api.openai.com/v1", label: "OpenAI" },
+  deepseek: {
+    keyVar: "DEEPSEEK_API_KEY",
+    baseUrl: "https://api.deepseek.com/v1",
+    label: "DeepSeek",
+  },
+  "openai-compatible": {
+    keyVar: "OPENAI_API_KEY",
+    baseUrl: "https://api.openai.com/v1",
+    label: "OpenAI-compatible",
+  },
+};
+
 const ENV_BY_ROLE: Record<LlmRole, { provider: string; model: string }> = {
   primary: {
-    provider: process.env.LLM_PRIMARY_PROVIDER ?? "anthropic",
-    model: process.env.LLM_PRIMARY_MODEL ?? "claude-opus-5",
+    provider: process.env.LLM_PRIMARY_PROVIDER ?? "gemini",
+    model: process.env.LLM_PRIMARY_MODEL ?? "gemini-2.5-flash",
   },
   secondary: {
-    provider: process.env.LLM_SECONDARY_PROVIDER ?? "anthropic",
-    model: process.env.LLM_SECONDARY_MODEL ?? "claude-sonnet-5",
+    provider: process.env.LLM_SECONDARY_PROVIDER ?? "groq",
+    model: process.env.LLM_SECONDARY_MODEL ?? "llama-3.3-70b-versatile",
   },
   judge: {
-    provider: process.env.LLM_JUDGE_PROVIDER ?? "anthropic",
-    model: process.env.LLM_JUDGE_MODEL ?? "claude-haiku-4-5-20251001",
+    provider: process.env.LLM_JUDGE_PROVIDER ?? "gemini",
+    model: process.env.LLM_JUDGE_MODEL ?? "gemini-2.5-flash-lite",
   },
 };
 
 function keyForRole(role: LlmRole): string | undefined {
   const provider = ENV_BY_ROLE[role].provider;
-  if (provider === "anthropic") return process.env.ANTHROPIC_API_KEY;
-  if (provider === "deepseek") return process.env.DEEPSEEK_API_KEY;
+  const defaults = PROVIDER_DEFAULTS[provider];
+  if (defaults) return process.env[defaults.keyVar];
   return process.env.OPENAI_API_KEY;
 }
 
@@ -59,24 +98,22 @@ export function readLlmConfig(role: LlmRole): LlmConfig {
   if (provider === "offline") {
     return { provider: "offline", model: "offline", apiKey: "" };
   }
+  const defaults = PROVIDER_DEFAULTS[provider];
   if (!apiKey) {
+    const hint = defaults
+      ? `Set ${defaults.keyVar} in .env.local (${defaults.label}).`
+      : "Set the matching key in .env.local.";
     throw new Error(
-      `No API key for role "${role}" (provider ${provider}, model ${model}). ` +
-        `Set the matching key in .env.local.`,
+      `No API key for role "${role}" (provider ${provider}, model ${model}). ${hint}`,
     );
   }
-  if (provider === "openai-compatible") {
-    return { provider, model, apiKey, baseUrl: process.env.OPENAI_BASE_URL };
-  }
-  if (provider === "deepseek") {
-    return {
-      provider: "openai-compatible",
-      model,
-      apiKey,
-      baseUrl: process.env.OPENAI_BASE_URL ?? "https://api.deepseek.com/v1",
-    };
-  }
-  return { provider: "anthropic", model, apiKey };
+  if (provider === "anthropic") return { provider: "anthropic", model, apiKey };
+  return {
+    provider: "openai-compatible",
+    model,
+    apiKey,
+    baseUrl: process.env.OPENAI_BASE_URL ?? defaults?.baseUrl,
+  };
 }
 
 /**
@@ -213,6 +250,22 @@ async function callAnthropic<S extends z.ZodType>(
 // OpenAI-compatible (DeepSeek, OpenRouter, Llama, Qwen, ...)
 // ---------------------------------------------------------------------------
 
+/**
+ * Free tiers throttle aggressively, and a full eval is ~240 sequential calls. A
+ * 429 mid-run would otherwise throw away half an hour of work, so retries are
+ * not optional here. Retry-After is honoured when the provider sends it.
+ */
+const MAX_RETRIES = 5;
+const BASE_BACKOFF_MS = 2_000;
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+function jsonSchemaFor(schema: z.ZodType): Record<string, unknown> {
+  // zod 4 can emit JSON Schema directly. Strict mode requires every property to
+  // be listed as required, which z.toJSONSchema does for object schemas.
+  return z.toJSONSchema(schema, { io: "output" }) as Record<string, unknown>;
+}
+
 async function callOpenAiCompatible<S extends z.ZodType>(
   config: LlmConfig,
   input: TurnInput,
@@ -220,48 +273,94 @@ async function callOpenAiCompatible<S extends z.ZodType>(
 ): Promise<StructuredResult<S>> {
   const started = Date.now();
   const baseUrl = (config.baseUrl ?? "https://api.openai.com/v1").replace(/\/$/, "");
+  const jsonSchema = jsonSchemaFor(schema);
 
-  const response = await fetch(`${baseUrl}/chat/completions`, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      authorization: `Bearer ${config.apiKey}`,
-    },
-    body: JSON.stringify({
-      model: config.model,
-      max_tokens: 2048,
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: input.system ?? RULES },
-        { role: "user", content: buildUserContent(input) },
-      ],
-    }),
-  });
+  let lastError = "";
 
-  if (!response.ok) {
-    throw new Error(`${config.model} request failed: ${response.status} ${await response.text()}`);
-  }
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt += 1) {
+    let response: Response;
+    try {
+      response = await fetch(`${baseUrl}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          authorization: `Bearer ${config.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: config.model,
+          max_tokens: 2048,
+          // Real schema enforcement, not just "return some JSON". A judge whose
+          // output fails to parse scores 0, so a loose response format would
+          // quietly corrupt every number in the results.
+          response_format: {
+            type: "json_schema",
+            json_schema: { name: "response", schema: jsonSchema, strict: true },
+          },
+          messages: [
+            { role: "system", content: input.system ?? RULES },
+            { role: "user", content: buildUserContent(input) },
+          ],
+        }),
+      });
+    } catch (networkError) {
+      lastError = `network: ${(networkError as Error).message}`;
+      if (attempt === MAX_RETRIES) break;
+      await sleep(BASE_BACKOFF_MS * 2 ** attempt);
+      continue;
+    }
 
-  const body = (await response.json()) as {
-    choices?: { message?: { content?: string } }[];
-  };
-  const raw = body.choices?.[0]?.message?.content ?? "";
+    if (response.status === 429 || response.status >= 500) {
+      const retryAfter = Number(response.headers.get("retry-after"));
+      const waitMs = Number.isFinite(retryAfter) && retryAfter > 0
+        ? retryAfter * 1000
+        : BASE_BACKOFF_MS * 2 ** attempt;
+      lastError = `HTTP ${response.status}`;
+      if (attempt === MAX_RETRIES) {
+        throw new Error(
+          `${config.model} throttled after ${MAX_RETRIES} retries (HTTP ${response.status}). ` +
+            `Free tiers throttle aggressively — rerun with --only to split the conditions.`,
+        );
+      }
+      await sleep(waitMs);
+      continue;
+    }
 
-  try {
-    return {
-      data: schema.parse(JSON.parse(raw)),
-      provider: config.provider,
-      model: config.model,
-      latencyMs: Date.now() - started,
-      degraded: false,
-      note: null,
+    if (!response.ok) {
+      throw new Error(
+        `${config.model} request failed: ${response.status} ${(await response.text()).slice(0, 300)}`,
+      );
+    }
+
+    const body = (await response.json()) as {
+      choices?: { message?: { content?: string } }[];
     };
-  } catch {
-    throw new Error(
-      `${config.model} returned JSON that did not match the expected schema: ` +
-        raw.slice(0, 200),
-    );
+    const raw = body.choices?.[0]?.message?.content ?? "";
+
+    try {
+      return {
+        data: schema.parse(JSON.parse(raw)),
+        provider: config.provider,
+        model: config.model,
+        latencyMs: Date.now() - started,
+        degraded: false,
+        note: attempt > 0 ? `Recovered after ${attempt} throttle(s) (${lastError}).` : null,
+      };
+    } catch (parseError) {
+      // One repair attempt: a provider that ignored strict mode is often fixed
+      // by asking again with the schema spelled out in the prompt.
+      if (attempt < MAX_RETRIES) {
+        lastError = `schema mismatch: ${(parseError as Error).message}`;
+        await sleep(BASE_BACKOFF_MS);
+        continue;
+      }
+      throw new Error(
+        `${config.model} returned JSON that did not match the expected schema: ` +
+          `${raw.slice(0, 200)}`,
+      );
+    }
   }
+
+  throw new Error(`${config.model} request failed: ${lastError}`);
 }
 
 // ---------------------------------------------------------------------------

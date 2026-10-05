@@ -40,30 +40,27 @@ IdentityForge introduces **Verifiable Agent Memory** powered by Walrus Protocol 
 
 ```mermaid
 flowchart TD
-    subgraph Client["Client UI (Next.js 15 + Vanilla CSS)"]
+    subgraph Client["Client UI"]
         User["User Interaction"]
-        Progress["Progressive Busy State (Reconstruct -> Infer -> Verify -> Commit)"]
-        Consent["Glowing Consent Card (Persona/Goal Approval)"]
-        ConsolidateBtn["⚡ Consolidate Snapshot (v+1)"]
+        Progress["Progressive Busy State: Reconstruct to Infer to Verify to Commit"]
+        Consent["Glowing Consent Card: Persona or Goal Approval"]
+        ConsolidateBtn["Consolidate Snapshot: v+1"]
     end
 
-    subgraph Server["Deterministic Agent Runtime (Node.js)"]
-        API["/api/chat / /api/confirm / /api/consolidate"]
-        
-        subgraph Pipeline["Dual-Channel Verification Pipeline"]
-            Reconstruct["1. Snapshot Reconstruction & Envelope Parsing"]
-            Assemble["2. Context Assembly & Available ID Tracking"]
-            Infer["3. LLM Inference (OpenRouter / gpt-oss-20b)"]
-            Verify{"4. verifyCitations() Engine"}
-            Fallback["Ignorance Admission / Grounded Degradation"]
-            Gate{"5. writeGate() Lexical Overlap & Consent Check"}
-        end
+    subgraph Server["Deterministic Agent Runtime"]
+        API["API Endpoints: chat, confirm, consolidate"]
+        Reconstruct["1. Snapshot Reconstruction & Envelope Parsing"]
+        Assemble["2. Context Assembly & Available ID Tracking"]
+        Infer["3. LLM Inference: OpenRouter / gpt-oss-20b"]
+        Verify{"4. Citation Verification Engine"}
+        Fallback["Ignorance Admission / Grounded Degradation"]
+        Gate{"5. Write Gate: Lexical Overlap & Consent Check"}
     end
 
-    subgraph OnChain["Decentralized Storage (Sui & Walrus)"]
+    subgraph OnChain["Decentralized Storage: Sui & Walrus"]
         WalrusStore[("Walrus Memory Protocol")]
-        SnapshotBlob[("Compacted Snapshot Blobs (v1..v4)")]
-        EnvelopeBlob[("Discrete Memory Envelopes (UUID-anchored)")]
+        SnapshotBlob[("Compacted Snapshot Blobs: v1 to v4")]
+        EnvelopeBlob[("Discrete Memory Envelopes: UUID anchored")]
         SuiLedger[("Sui Blockchain Ledger Object")]
     end
 
@@ -78,7 +75,7 @@ flowchart TD
     Verify -->|Cryptographically Verified UUIDs| Gate
     Gate -->|Requires Consent| Consent
     Consent -->|User Approves| WalrusStore
-    Gate -->|Low Stakes (Preference)| WalrusStore
+    Gate -->|Low Stakes: Preference| WalrusStore
     ConsolidateBtn -->|Merge Facts into Immutable Snapshot| SnapshotBlob
     WalrusStore --- SuiLedger
 ```

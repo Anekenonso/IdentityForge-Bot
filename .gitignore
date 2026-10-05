@@ -23,9 +23,13 @@ PROOF_OF_PORTABILITY_GUIDE.md
 DEMO_VIDEO_STORYBOARD.md
 DUAL_SCREEN_RECORDING_GUIDE.md
 
-# Video recordings
+# Video recordings and demo video project
 Video files/
+demo-video/
 *.mp4
+*.webm
+*.mov
+*.avi
 
 
 

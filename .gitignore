@@ -16,3 +16,9 @@ npm-debug.log*
 # Raw spike / evidence dumps may contain blob ids but are regenerated per run
 evidence/spike/*.raw.json
 results/*.tmp.json
+
+# Internal planning, judge guides & video storyboards
+IdentityForge_Build_Plan*.md
+PROOF_OF_PORTABILITY_GUIDE.md
+DEMO_VIDEO_STORYBOARD.md
+

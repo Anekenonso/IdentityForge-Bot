@@ -65,6 +65,12 @@ export async function POST(req: Request) {
       snapshotFound: result.snapshotFound,
       droppedCount: result.droppedCount,
       latencyMs: result.latencyMs,
+      citationsVerified: result.citations.length > 0 && !result.degraded,
+      groundingStatus: result.degraded
+        ? "FAILED_FALLBACK"
+        : result.citations.length > 0
+        ? "VERIFIED"
+        : "NO_HISTORY_CLAIM",
     });
   } catch (error) {
     const message_ = (error as Error).message;

@@ -36,6 +36,8 @@ export default function Page() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [busyStage, setBusyStage] = useState<string>("");
+  const [consolidating, setConsolidating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [evidence, setEvidence] = useState<EvidenceRow[]>([]);
   const [health, setHealth] = useState<HealthPayload | null>(null);
@@ -71,13 +73,54 @@ export default function Page() {
     }
   };
 
+  const consolidate = async () => {
+    setConsolidating(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/consolidate", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ namespace: health?.namespace }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail ?? data.error ?? "Consolidation failed.");
+
+      setMessages((m) => [
+        ...m,
+        {
+          role: "assistant",
+          text: `⚡ Consolidated Snapshot v${data.version} committed to Walrus!\n\n${data.summary}`,
+          citations: [],
+          pending: [],
+          diagnostics: {
+            model: "system:consolidate",
+            snapshotFound: true,
+            degraded: false,
+            droppedCount: 0,
+            latencyMs: data.latencyMs,
+          },
+        },
+      ]);
+      void loadHealth();
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setConsolidating(false);
+    }
+  };
+
   const send = async (explicitText?: string) => {
     const text = (explicitText ?? input).trim();
     if (!text || busy) return;
     setInput("");
     setError(null);
     setBusy(true);
+    setBusyStage("Reconstructing memories from Sui…");
     setMessages((m) => [...m, { role: "user", text }]);
+
+    const t1 = setTimeout(() => setBusyStage("Synthesizing with cryptographic grounding…"), 4000);
+    const t2 = setTimeout(() => setBusyStage("Verifying citations & checking write gate…"), 12000);
+    const t3 = setTimeout(() => setBusyStage("Committing ciphertext to Walrus on Sui…"), 22000);
 
     try {
       const res = await fetch("/api/chat", {
@@ -112,7 +155,11 @@ export default function Page() {
       setMessages((m) => m.slice(0, -1));
       setInput(text);
     } finally {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
       setBusy(false);
+      setBusyStage("");
       setTimeout(() => inputRef.current?.focus(), 50);
     }
   };
@@ -360,6 +407,13 @@ export default function Page() {
           </div>
         )}
 
+        {busy && busyStage && (
+          <div className="progressive-status" role="status" aria-live="polite">
+            <span className="progressive-pulse" aria-hidden="true"></span>
+            <span className="progressive-text">{busyStage}</span>
+          </div>
+        )}
+
         <form className="composer-form" onSubmit={handleFormSubmit}>
           <div className="composer">
             <input
@@ -490,6 +544,26 @@ export default function Page() {
           <p style={{ margin: "8px 0 0", fontSize: 12, color: "var(--muted)", lineHeight: 1.45 }}>
             Switching the model proves identity follows your Walrus key rather than provider weights.
           </p>
+        </section>
+
+        <section className="section">
+          <h2>
+            <span>Snapshot Consolidation</span>
+            <span className="pill-tag">v-backbone</span>
+          </h2>
+          <p style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 10px", lineHeight: 1.45 }}>
+            Synthesizes scattered facts into an immutable versioned snapshot envelope on Walrus.
+          </p>
+          <button
+            type="button"
+            className="brand"
+            disabled={consolidating || busy}
+            onClick={() => void consolidate()}
+            style={{ width: "100%" }}
+            title="Merges individual memories into a versioned snapshot blob on Walrus"
+          >
+            {consolidating ? "Consolidating onchain…" : "⚡ Consolidate Snapshot (v+1)"}
+          </button>
         </section>
 
         <section className="section">

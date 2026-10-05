@@ -49,7 +49,11 @@ export function tokenize(text: string): string[] {
 }
 
 export function userOverlap(candidate: string, userMessage: string): number {
-  const contentTokens = new Set(tokenize(candidate));
+  const cleaned = candidate.replace(
+    /^(?:the\s+)?user(?:\s+identity|\s+name|'s\s+name|'s\s+identity)?\s*[:=-]\s*/i,
+    "",
+  );
+  const contentTokens = new Set(tokenize(cleaned.trim() ? cleaned : candidate));
   if (contentTokens.size === 0) return 0;
   const userTokens = new Set(tokenize(userMessage));
   let shared = 0;

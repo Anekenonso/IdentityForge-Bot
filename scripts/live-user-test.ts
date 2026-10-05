@@ -9,6 +9,7 @@
  * - Consent / confirmation flows
  * - Architectural alignment with project thesis
  */
+export {};
 
 const BASE_URL = "http://localhost:3001";
 

@@ -2,6 +2,7 @@
 // Comprehensive stress testing suite for IdentityForge Bot
 // Tests: Snapshot consolidation, Grounded identity recall, Negative probes (Zero Hallucination),
 // Adversarial attacks / Citation-fabrication defense, and Concurrent rapid bursts.
+export {};
 
 const BASE_URL = process.env.TEST_APP_URL || 'http://localhost:3001';
 
@@ -285,10 +286,11 @@ async function runStressTest() {
 
   burstResponses.forEach((res, i) => {
     const pass = res.statusCode === 200 && res.reply.length > 0;
+    const queryText = burstQueries[i] ?? '';
     recordResult(
       'Phase 6: Rapid Burst',
       pass,
-      `Burst #${i + 1} ("${burstQueries[i].slice(0, 30)}..."): Status=${res.statusCode}, Grounding=${res.groundingStatus}`,
+      `Burst #${i + 1} ("${queryText.slice(0, 30)}..."): Status=${res.statusCode}, Grounding=${res.groundingStatus}`,
       res.durationMs
     );
   });

@@ -145,7 +145,25 @@ async function main(): Promise<void> {
 
     const outcomes: ProbeOutcome[] = [];
     for (const [i, probe] of probes.entries()) {
-      const outcome = await runProbe(probe, condition.namespace, condition.role);
+      let outcome: ProbeOutcome;
+      try {
+        outcome = await runProbe(probe, condition.namespace, condition.role);
+      } catch (err) {
+        outcome = {
+          probeId: probe.id,
+          kind: probe.kind,
+          question: probe.question,
+          reply: `[Error: ${(err as Error).message}]`,
+          score: 0,
+          maxScore: 2,
+          assertedForbidden: false,
+          admittedIgnorance: false,
+          reason: `Execution failed: ${(err as Error).message}`,
+          citations: 0,
+          snapshotFound: false,
+          latencyMs: 0,
+        };
+      }
       outcomes.push(outcome);
       const mark = outcome.score === 2 ? "OK " : outcome.score === 1 ? "~  " : "X  ";
       process.stdout.write(
@@ -172,6 +190,10 @@ async function main(): Promise<void> {
         `leak ${summary.leakPct.toFixed(0)}%  ` +
         `snapshot ${summary.snapshotFoundPct.toFixed(0)}%\n`,
     );
+
+    // Save incrementally so results are never lost if interrupted
+    await mkdir("results", { recursive: true });
+    await writeFile(`results/run-latest.json`, JSON.stringify(results, null, 2), "utf8");
   }
 
   await mkdir("results", { recursive: true });

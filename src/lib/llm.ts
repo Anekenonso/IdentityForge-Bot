@@ -288,6 +288,7 @@ async function callOpenAiCompatible<S extends z.ZodType>(
     try {
       response = await fetch(`${baseUrl}/chat/completions`, {
         method: "POST",
+        signal: AbortSignal.timeout(45_000),
         headers: {
           "content-type": "application/json",
           authorization: `Bearer ${config.apiKey}`,

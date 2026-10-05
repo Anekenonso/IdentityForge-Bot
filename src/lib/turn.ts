@@ -197,7 +197,11 @@ export async function runTurn(options: TurnOptions): Promise<TurnResult> {
       sessionHashes: seen,
       turnWriteCount: writesThisTurn,
       sessionWriteCount: writesThisSession,
-      confirmed: true,
+      confirmed: Boolean(
+        confirmedIds &&
+          (confirmedIds.has(memoryKey) ||
+            (typeof (raw as any)?.id === "string" && confirmedIds.has((raw as any).id))),
+      ),
     });
 
     if (decision.accepted && decision.memory) {

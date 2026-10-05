@@ -21,4 +21,11 @@ results/*.tmp.json
 IdentityForge_Build_Plan*.md
 PROOF_OF_PORTABILITY_GUIDE.md
 DEMO_VIDEO_STORYBOARD.md
+DUAL_SCREEN_RECORDING_GUIDE.md
+
+# Video recordings
+Video files/
+*.mp4
+
+
 

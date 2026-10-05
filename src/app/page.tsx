@@ -126,7 +126,7 @@ export default function Page() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ message: text, role }),
+        body: JSON.stringify({ message: text, role, namespace: health?.namespace }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail ?? data.error ?? "Request failed.");
@@ -174,7 +174,7 @@ export default function Page() {
       const res = await fetch("/api/confirm", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ type: item.type, content: item.content }),
+        body: JSON.stringify({ type: item.type, content: item.content, namespace: health?.namespace }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail ?? "Write failed.");

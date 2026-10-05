@@ -9,6 +9,7 @@
  */
 
 import type { MemoryEnvelope } from "./envelope.ts";
+import { tokenize } from "./writegate.ts";
 
 export const NO_MEMORY_REPLY = "I don't have that in my memory.";
 
@@ -41,13 +42,31 @@ function isQuestion(sentence: string): boolean {
   );
 }
 
-export function looksLikeHistoryClaim(reply: string): boolean {
+export function looksLikeHistoryClaim(reply: string, userMessage?: string): boolean {
   const sentences = reply.split(/(?<=[.!?])\s+/).filter((s) => s.trim().length > 0);
-  return sentences.some(
-    (sentence) =>
-      !isQuestion(sentence) &&
-      HISTORY_CLAIM_PATTERNS.some((pattern) => pattern.test(sentence)),
-  );
+  const userTokens = userMessage ? new Set(tokenize(userMessage)) : null;
+
+  return sentences.some((sentence) => {
+    if (isQuestion(sentence)) return false;
+    const matches = HISTORY_CLAIM_PATTERNS.some((pattern) => pattern.test(sentence));
+    if (!matches) return false;
+
+    // If the sentence is merely echoing or acknowledging what the user literally said in this turn's message,
+    // it is not a claim about unrecorded past history.
+    if (userTokens && userTokens.size > 0) {
+      const sentenceTokens = tokenize(sentence);
+      if (sentenceTokens.length > 0) {
+        let overlap = 0;
+        for (const token of sentenceTokens) {
+          if (userTokens.has(token)) overlap++;
+        }
+        if (overlap / sentenceTokens.length >= 0.35) {
+          return false;
+        }
+      }
+    }
+    return true;
+  });
 }
 
 export interface CitationCheck {
@@ -66,13 +85,14 @@ export interface VerifyInput {
   citedIds: readonly string[];
   /** Ids actually available in the reconstructed context this turn. */
   availableIds: ReadonlySet<string>;
+  userMessage?: string;
 }
 
 export function verifyCitations(input: VerifyInput): CitationCheck {
-  const { reply, citedIds, availableIds } = input;
+  const { reply, citedIds, availableIds, userMessage } = input;
 
   if (citedIds.length === 0) {
-    const uncited = looksLikeHistoryClaim(reply);
+    const uncited = looksLikeHistoryClaim(reply, userMessage);
     if (uncited) {
       return {
         valid: false,

@@ -101,26 +101,7 @@ export async function runTurn(options: TurnOptions): Promise<TurnResult> {
     }),
   );
 
-  // 2. Empty state -> onboarding, no model call ---------------------------
-  if (reconstruction.empty) {
-    return {
-      reply: ONBOARDING_NOTE,
-      citations: [],
-      written: [],
-      pending: [],
-      rejected: [],
-      evidence,
-      empty: true,
-      degraded: false,
-      diagnostic: null,
-      model: "none",
-      snapshotFound: false,
-      droppedCount: 0,
-      latencyMs: Date.now() - started,
-    };
-  }
-
-  // 3. ASSEMBLE ------------------------------------------------------------
+  // 2. ASSEMBLE ------------------------------------------------------------
   const prompt = assemblePrompt(reconstruction, userMessage);
   const availableIds = new Set(prompt.availableIds);
 
@@ -140,6 +121,7 @@ export async function runTurn(options: TurnOptions): Promise<TurnResult> {
     reply,
     citedIds,
     availableIds,
+    userMessage,
   });
 
   if (!check.valid && check.shouldRegenerate) {
@@ -155,6 +137,7 @@ export async function runTurn(options: TurnOptions): Promise<TurnResult> {
       reply: retry.response.reply,
       citedIds: retry.response.cited_ids,
       availableIds,
+      userMessage,
     });
 
     if (retryCheck.valid) {
@@ -178,21 +161,6 @@ export async function runTurn(options: TurnOptions): Promise<TurnResult> {
       reply = NO_MEMORY_REPLY;
       citedIds = [];
       degraded = true;
-      return {
-        reply,
-        citations: [],
-        written: [],
-        pending: [],
-        rejected: [],
-        evidence,
-        empty: false,
-        degraded: true,
-        diagnostic: `Unverifiable claim suppressed. ${retryCheck.reason}`,
-        model: config.model,
-        snapshotFound: reconstruction.snapshot !== null,
-        droppedCount: reconstruction.droppedCount,
-        latencyMs: Date.now() - started,
-      };
     }
   }
 

@@ -1,0 +1,16 @@
+{
+  "label": "REAL",
+  "notes": "10 real probes written from memory after dogfooding with Kenneth, BEFORE inspecting the memory store. Adheres to the Veris dogfooding protocol.",
+  "probes": [
+    { "id": "r01", "kind": "direct",   "question": "What is my name?",                                        "expect": "Kenneth" },
+    { "id": "r02", "kind": "direct",   "question": "What do I do for a living?",                               "expect": "full stack software developer" },
+    { "id": "r03", "kind": "direct",   "question": "Where am I from originally?",                             "expect": "Nigeria" },
+    { "id": "r04", "kind": "direct",   "question": "What project am I building?",                             "expect": "decentralized AI SaaS on Sui" },
+    { "id": "g01", "kind": "goal",     "question": "What is my immediate goal?",                              "expect": "submit IdentityForge to the Walrus hackathon" },
+    { "id": "g02", "kind": "goal",     "question": "Why did I move to Italy?",                                 "expect": "for my Masters degree program" },
+    { "id": "t01", "kind": "trap",     "question": "Which styling approach or CSS framework did I choose?",     "expect": "Vanilla CSS", "forbidden": ["TailwindCSS"] },
+    { "id": "t02", "kind": "trap",     "question": "Where do I currently live?",                               "expect": "Italy", "forbidden": ["Enugu"] },
+    { "id": "n01", "kind": "negative", "question": "What is my favorite food?",                                "expect": null },
+    { "id": "n02", "kind": "negative", "question": "What is my phone number?",                                 "expect": null }
+  ]
+}
